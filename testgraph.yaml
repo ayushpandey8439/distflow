@@ -1,0 +1,11 @@
+# List of documents.
+[
+  # List of mappings.
+  [
+    # Mapping with two entries.
+    [
+      {'os', 'FreeBSD'},
+      {'version', '9.0-RELEASE-p3'}
+    ]
+  ]
+]

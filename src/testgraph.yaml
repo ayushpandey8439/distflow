@@ -1,0 +1,9 @@
+- application: kernel
+  version:     2.15.3
+  path:        /usr/local/lib/erlang/lib/kernel-2.15.3
+- application: stdlib
+  version:     1.18.3
+  path:        /usr/local/lib/erlang/lib/stdlib-1.18.3
+- application: sasl
+  version:     2.2.1
+  path:        /usr/local/lib/erlang/lib/sasl-2.2.1
