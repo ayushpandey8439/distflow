@@ -32,7 +32,7 @@ handle_call({regex,Expression,Target}, _From, State = #controller_state{}) ->
   {reply, {ok,MatchCount}, State};
 
 handle_call({parse,Input}, _From, State = #controller_state{}) ->
-  Reply = mochiweb_html:parse(Input),
+  Reply = html_parser:parse(Input),
   {reply, Reply, State};
 
 handle_call({extract,Input}, _From, State = #controller_state{}) ->
