@@ -3,7 +3,7 @@
 -behaviour(gen_statem).
 
 -export([terminate/3,code_change/4,init/1,callback_mode/0]).
--export([start/0,stop/0,match/3,parse/2,extract/2]).
+-export([start/0,stop/0,match/3,parse/2,extract/2,map/2]).
 name() -> runner_statem.
 
 
@@ -28,5 +28,8 @@ extract(Target,ParsedHTML) ->
     gen_server:call(Target,{extract,ParsedHTML}).
 match(Target,Regex,Input)->
     gen_server:call(Target, {regex,Regex,Input}).
+map(Target,TaskList)->
+    io:format("Called map with the task list :: ~p ~n ~n",[TaskList]),
+    gen_server:call(Target, {map,TaskList}).
 stop() ->
     gen_statem:stop(name()).

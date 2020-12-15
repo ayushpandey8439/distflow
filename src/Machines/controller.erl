@@ -32,11 +32,17 @@ handle_call({regex,Expression,Target}, _From, State = #controller_state{}) ->
   {reply, {ok,MatchCount}, State};
 
 handle_call({parse,Input}, _From, State = #controller_state{}) ->
+  io:format("Received a call to parse"),
   Reply = html_parser:parse(Input),
   {reply, Reply, State};
 
 handle_call({extract,Input}, _From, State = #controller_state{}) ->
   Reply = extract:extract(Input,Text=""),
+  {reply, Reply, State};
+
+handle_call({map,TaskList}, _From, State = #controller_state{}) ->
+  io:format("Received a call to map"),
+  Reply = map:map(TaskList),
   {reply, Reply, State};
 
 handle_call(_Request, _From, State = #controller_state{}) ->

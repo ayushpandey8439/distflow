@@ -16,6 +16,6 @@ runtask() ->
   Input= "<html> <head>  <title>This is a title</title> </head> <body> This is the body </body> </html>",
   Target = {controller,'runner2@127.0.0.1'},
   Regex = "This",
-  Parsed = runner:parse(Target,Input),
+  Parsed = apply(runner,parse,[Target,Input]),
   Text = runner:extract(Target,Parsed),
   MatchCount = runner:match(Target,Regex,Text).

@@ -10,8 +10,8 @@
 -author("pandey").
 
 %% API
--export([map/2]).
+-export([map/1]).
 
-map(Function,List) ->
+map(TaskList) ->
   %%TODO Perform map operation on the List and then spawn the process on the target node
-  lists:foreach(Function,List).
+  lists:map(fun({Target,FunctionName,Input}) -> apply(runner,FunctionName,[Target,Input]) end,TaskList).

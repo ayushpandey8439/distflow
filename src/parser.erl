@@ -13,4 +13,5 @@
 -export([read/0]).
 
 read()->
-  yamerl_constr:file("testgraph.yaml",[{detailed_constr, true}]).
+  application:start(yamerl),
+  yamerl_constr:file("./testgraph.yaml",[{detailed_constr, true}]).
