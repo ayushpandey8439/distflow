@@ -1,11 +1,16 @@
-# List of documents.
-[
-  # List of mappings.
-  [
-    # Mapping with two entries.
-    [
-      {'os', 'FreeBSD'},
-      {'version', '9.0-RELEASE-p3'}
-    ]
-  ]
-]
+- task: parse
+  input: "<html> <head>  <title>This is a title</title> </head> <body> This is the body </body> </html>"
+  target: "runner2@127.0.0.1"
+- task: echo
+  input: $
+  target: "runner2@127.0.0.1"
+- task: extract
+  input: $
+  target: "runner2@127.0.0.1"
+- task: echo
+  input: $
+  target: "runner2@127.0.0.1"
+- task: match
+  input: $
+  regex: "This"
+  target: "runner2@127.0.0.1"

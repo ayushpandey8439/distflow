@@ -4,14 +4,14 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 27. Nov 2020 18:42
+%%% Created : 21. Dec 2020 05:10
 %%%-------------------------------------------------------------------
--module(parser).
+-module(echo).
 -author("pandey").
 
 %% API
--export([read/1]).
+-export([echo/1]).
 
-read(Path)->
-  application:start(yamerl),
-  yamerl_constr:file(Path).
+echo(Input)->
+  io:format("~p ~n",[Input]),
+  Input.
