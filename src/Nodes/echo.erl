@@ -10,8 +10,26 @@
 -author("pandey").
 
 %% API
--export([echo/1]).
+-export([echo/3]).
 
-echo(Input)->
-  io:format("~p ~n",[Input]),
-  Input.
+echo("io","@"++Value,Map)->
+  case maps:is_key(Value,Map) of
+    false ->
+      io:format("Key does not exist in the map");
+    true ->
+      io:format("~p ~n~n",[maps:get(Value,Map)])
+  end,
+ Map;
+echo("io",Value,Map)->
+  io:format("~p",[Value]),
+  Map;
+
+echo(Put,Value,Map)->
+      case maps:is_key(Put,Map) of
+        false ->
+          UpdatedMap = maps:put(Put,Value,Map),
+          UpdatedMap;
+        true ->
+          UpdatedMap = maps:update(Put,Value,Map),
+          UpdatedMap
+      end.

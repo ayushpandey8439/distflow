@@ -13,7 +13,6 @@
 -export([match/2]).
 
 match(Input,Regex) ->
-  io:format("Received ""~p ~p ~n ~n",[Input,Regex]),
   {ok,MP} = re:compile(Regex),
   MatchStatus = re:run(Input,MP,[global]),
   case MatchStatus of
