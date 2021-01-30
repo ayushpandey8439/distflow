@@ -2,12 +2,12 @@
   value: "<html> <head>  <title>This is a title</title> </head> <body> This is the body </body>
   </html>"
   put: html_text
-  target: "runner2@127.0.0.1"
+  target: "runner1@127.0.0.1"
 - task: parse
   value: @html_text
   output: parsed_html
-  target: "runner2@127.0.0.1"
+  target: "runner1@127.0.0.1"
 - task: echo
   value: @parsed_html
   put: io
-  target: "runner2@127.0.0.1"
+  target: "runner1@127.0.0.1"

@@ -7,6 +7,7 @@
 -module(controller).
 
 -behaviour(gen_server).
+-include_lib("kernel/include/logger.hrl").
 
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
@@ -51,7 +52,7 @@ handle_call({parse,Value,Output}, _From, State = #controller_state{}) ->
   .flow_map)}};
 
 handle_call({extract,Input}, _From, State = #controller_state{}) ->
-  Reply = extract:extract(Input,Text=""),
+  Reply = extract:extract(Input,""),
   {reply, Reply, State};
 
 handle_call({map,TaskList}, _From, State = #controller_state{}) ->
@@ -59,6 +60,7 @@ handle_call({map,TaskList}, _From, State = #controller_state{}) ->
   {reply, Reply, State};
 
 handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
+  logger:log(error,"echo called"),
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
