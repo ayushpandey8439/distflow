@@ -60,7 +60,7 @@ handle_call({map,TaskList}, _From, State = #controller_state{}) ->
   {reply, Reply, State};
 
 handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
-  logger:log(error,"echo called"),
+  logger:info("echo called"),
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
