@@ -11,4 +11,4 @@ graphs:
     - type: echo
       value: {html_text}
       put: io
-      target: "runner1@127.0.0.1"
+      target: "runner2@127.0.0.1"

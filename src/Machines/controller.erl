@@ -61,8 +61,7 @@ handle_call({map,TaskList}, _From, State = #controller_state{}) ->
 
 handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
-  %%lists:foreach(fun(Node)-> gen_server:cast({controller,Node}, {update_map,UpdatedMap}) end,
-  %% nodes ()),
+  gen_server:abcast(name(),{update_map,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call(_Request, _From, State = #controller_state{}) ->
