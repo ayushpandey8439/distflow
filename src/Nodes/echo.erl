@@ -12,7 +12,7 @@
 %% API
 -export([echo/3]).
 
-echo("io","@"++Value,Map)->
+echo("io",[{Value,_}],Map)->
   case maps:is_key(Value,Map) of
     false ->
       io:format("Key does not exist in the map");
@@ -20,9 +20,6 @@ echo("io","@"++Value,Map)->
       io:format("~p ~n~n",[maps:get(Value,Map)])
   end,
  Map;
-echo("io",Value,Map)->
-  io:format("~p",[Value]),
-  Map;
 
 echo(Put,Value,Map)->
       case maps:is_key(Put,Map) of

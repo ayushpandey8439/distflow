@@ -22,10 +22,12 @@ callback_mode() -> state_functions.
 
 start() ->
     gen_statem:start({local,name()}, ?MODULE, [], []).
+
 parse(Target,Task)->
     Value = (element(2,lists:keyfind("value",1,Task))),
     Output = (element(2,lists:keyfind("output",1,Task))),
     gen_server:call(Target, {parse,Value,Output}).
+
 extract(Target,ParsedHTML) ->
     gen_server:call(Target,{extract,ParsedHTML}).
 match(Target,{Input,Regex})->
@@ -38,3 +40,5 @@ echo(Target,Task)->
     gen_server:call(Target, {echo,Put,Value}).
 stop() ->
     gen_statem:stop(name()).
+
+
