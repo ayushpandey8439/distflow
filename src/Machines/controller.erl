@@ -64,11 +64,14 @@ handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
   gen_server:abcast(name(),{update_map,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
+handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
+  TemplateReplacedTaskList = replaceTemplates:replace(Task,State#controller_state.flow_map),
+  {reply, TemplateReplacedTaskList, State};
+
 handle_call(_Request, _From, State = #controller_state{}) ->
   {reply, ok, State}.
 
 handle_cast({update_map,Map}, State = #controller_state{}) ->
-  io:format("Map update"),
   {noreply, State#controller_state{flow_map = Map}};
 
 handle_cast(_Request, State = #controller_state{}) ->

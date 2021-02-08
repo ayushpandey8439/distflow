@@ -34,10 +34,13 @@ match(Target,{Input,Regex})->
     gen_server:call(Target, {regex,Regex,Input}).
 map(Target,TaskList)->
     gen_server:call(Target, {map,TaskList}).
+
 echo(Target,Task)->
-    Value = (element(2,lists:keyfind("value",1,Task))),
-    Put = (element(2,lists:keyfind("put",1,Task))),
+    TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+    Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
+    Put = (element(2,lists:keyfind("put",1,TemplatedTask))),
     gen_server:call(Target, {echo,Put,Value}).
+
 stop() ->
     gen_statem:stop(name()).
 
