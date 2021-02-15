@@ -2,4 +2,4 @@
 -name runner1@127.0.0.1
 
 ## Cookie for distributed erlang
--setcookie flow-cookie
+-setcookie distFlow-cookie

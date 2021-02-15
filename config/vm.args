@@ -1,5 +1,5 @@
 ## Name of the node
--name flow@127.0.0.1
+-name distFlow@127.0.0.1
 
 ## Cookie for distributed erlang
--setcookie flow
+-setcookie distFlow

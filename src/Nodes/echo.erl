@@ -12,16 +12,10 @@
 %% API
 -export([echo/3]).
 
-echo("io",Value,Map)->
+echo(io,Value,Map)->
   io:format("~p ~n",[Value]),
  Map;
 
 echo(Put,Value,Map)->
-      case maps:is_key(Put,Map) of
-        false ->
-          UpdatedMap = maps:put(Put,Value,Map),
-          UpdatedMap;
-        true ->
-          UpdatedMap = maps:update(Put,Value,Map),
-          UpdatedMap
-      end.
+  UpdatedMap = maps:put(Put,Value,Map),
+  UpdatedMap.

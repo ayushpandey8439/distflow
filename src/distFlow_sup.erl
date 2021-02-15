@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc flow top level supervisor.
+%% @doc distFlow top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(flow_sup).
+-module(distFlow_sup).
 
 -behaviour(supervisor).
 
@@ -25,28 +25,27 @@ start_link() ->
 %%                  shutdown => shutdown(), % optional
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
-
 init([]) ->
     SupFlags = #{strategy => one_for_all,
                  intensity => 0,
                  period => 1},
-    RunnerMachine = #{
-        id => task_runner,
-        start => {runner, start,[]},
-        restart => permanent,
-        shutdown => 5000,
-        type => supervisor,
-        modules => [runner]
-        },
-     NodeController = #{
-        id => node_controller,
-        start => {controller, start_link,[]},
-        restart => permanent,
-        shutdown => 5000,
-        type => supervisor,
-        modules => [controller]
-        },
-    ChildSpecs = [RunnerMachine,NodeController],
+  NodeController = #{
+    id => node_controller,
+    start => {controller, start_link,[]},
+    restart => permanent,
+    shutdown => 5000,
+    type => supervisor,
+    modules => [controller]
+  },
+  MessageBroker = #{
+    id => message_broker,
+    start => {message_broker, start_link,[]},
+    restart => permanent,
+    shutdown => 5000,
+    type => supervisor,
+    modules => [message_broker]
+  },
+    ChildSpecs = [NodeController,MessageBroker],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

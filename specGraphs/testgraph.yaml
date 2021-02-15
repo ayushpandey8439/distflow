@@ -2,13 +2,15 @@ name: Test
 graphs:
   start:
     - type: echo
-      value:
-        id: "id1"
-        name: "ayush"
+      value: "Final Data to be print"
+      put: test
+      target: "runner1@127.0.0.1"
+    - type: echo
+      value: "{test} on the console"
       put: html_text
       target: "runner2@127.0.0.1"
 
     - type: echo
-      value: "{html_text}"
+      value: "{html_text} by the runner"
       put: io
-      target: "runner2@127.0.0.1"
+      target: "runner3@127.0.0.1"

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/flow.iml" filepath="$PROJECT_DIR$/.idea/flow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/distFlow.iml" filepath="$PROJECT_DIR$/.idea/distFlow.iml" />
     </modules>
   </component>
 </project>

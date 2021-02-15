@@ -5,11 +5,11 @@ CT_OPTS_DIST = -erl_args
 
 DEPS_PATH = $(shell rebar3 as test path)
 
-RELPATH = _build/default/rel/flow
-DEV1RELPATH = _build/dev1/rel/flow
-DEV2RELPATH = _build/dev2/rel/flow
-DEV3RELPATH = _build/dev3/rel/flow
-APPNAME = flow
+RELPATH = _build/default/rel/distFlow
+DEV1RELPATH = _build/dev1/rel/distFlow
+DEV2RELPATH = _build/dev2/rel/distFlow
+DEV3RELPATH = _build/dev3/rel/distFlow
+APPNAME = distFlow
 
 
 ifdef SUITE
@@ -49,7 +49,7 @@ rel:
 
 
 console:
-	cd $(RELPATH) && ./bin/flow console
+	cd $(RELPATH) && ./bin/distdistFlow console
 
 
 devrel: dev1rel dev2rel dev3rel
@@ -63,9 +63,9 @@ dev3rel:
 	$(REBAR) as dev3 release
 
 dev1-console:
-	$(BASEDIR)/_build/dev1/rel/flow/bin/flow console
+	$(BASEDIR)/_build/dev1/rel/distFlow/bin/distFlow console
 dev2-console:
-	$(BASEDIR)/_build/dev2/rel/flow/bin/flow console
+	$(BASEDIR)/_build/dev2/rel/distFlow/bin/distFlow console
 dev3-console:
-	$(BASEDIR)/_build/dev3/rel/flow/bin/flow console
+	$(BASEDIR)/_build/dev3/rel/distFlow/bin/distFlow console
 

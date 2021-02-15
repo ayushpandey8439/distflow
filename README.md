@@ -1,4 +1,4 @@
-flow
+distFlow
 =====
 
 An OTP application
