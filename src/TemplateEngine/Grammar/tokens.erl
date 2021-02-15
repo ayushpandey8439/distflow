@@ -12,7 +12,7 @@
 -export([format_error/1]).
 
 %% User code. This is placed here to allow extra attributes.
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 22).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 22).
 
 atom(TokenChars) -> list_to_atom(TokenChars).
 
@@ -309,7 +309,7 @@ adjust_line(T, A, [_|Cs], L) ->
 %% return signal either an unrecognised character or end of current
 %% input.
 
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.erl", 312).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.erl", 312).
 yystate() -> 6.
 
 yystate(7, [95|Ics], Line, Tlen, _, _) ->
@@ -389,37 +389,37 @@ yyaction(6, TokenLen, YYtcs, TokenLine) ->
 yyaction(_, _, _, _) -> error.
 
 -compile({inline,yyaction_0/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 12).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 12).
 yyaction_0(TokenChars, TokenLine) ->
      { token, { keylookup, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_1/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 13).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 13).
 yyaction_1(TokenChars, TokenLine) ->
      { token, { bracketopen, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_2/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 14).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 14).
 yyaction_2(TokenChars, TokenLine) ->
      { token, { bracketclose, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_3/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 15).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 15).
 yyaction_3(TokenChars, TokenLine) ->
      { token, { braceopen, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_4/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 16).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 16).
 yyaction_4(TokenChars, TokenLine) ->
      { token, { braceclose, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_5/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 17).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 17).
 yyaction_5(TokenChars, TokenLine) ->
      { token, { digit, TokenLine, list_to_integer (TokenChars) } } .
 
 -compile({inline,yyaction_6/2}).
--file("/Users/pandey/Desktop/Notes/thesis/distFlow/src/TemplateEngine/Grammar/tokens.xrl", 18).
+-file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 18).
 yyaction_6(TokenChars, TokenLine) ->
      { token, { string, TokenLine, list_to_atom (TokenChars) } } .
 

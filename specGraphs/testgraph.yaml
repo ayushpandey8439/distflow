@@ -6,11 +6,24 @@ graphs:
       put: test
       target: "runner1@127.0.0.1"
     - type: echo
-      value: "{test} on the console"
+      value:
+        name: "ayush"
+        age: "25"
+      put: okmap
+      target: "runner1@127.0.0.1"
+    - type: echo
+      value:
+        - a
+        - b
+        - c
+        - d
+      put: okArray
+      target: "runner1@127.0.0.1"
+    - type: echo
+      value: "{okArray}[2] on the console"
       put: html_text
-      target: "runner2@127.0.0.1"
-
+      target: "runner1@127.0.0.1"
     - type: echo
       value: "{html_text} by the runner"
       put: io
-      target: "runner3@127.0.0.1"
+      target: "runner1@127.0.0.1"
