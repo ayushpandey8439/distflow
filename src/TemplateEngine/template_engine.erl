@@ -50,11 +50,21 @@ treewalker({concat,Part1,Part2},Map)->
   Left= treewalker(Part1,Map),
   Right = treewalker(Part2,Map),
   string:concat(
-    if is_atom(Left)->
-      atom_to_list(Left);
+    if
+      is_atom(Left)->
+        atom_to_list(Left);
+      is_integer(Left) ->
+        integer_to_list(Left);
+      is_float(Left) ->
+        float_to_list(Left);
       true-> Left end,
-    if is_atom(Right) ->
-      atom_to_list(Right);
+    if
+      is_atom(Right) ->
+        atom_to_list(Right);
+      is_integer(Right) ->
+        integer_to_list(Right);
+      is_float(Right) ->
+        float_to_list(Right);
       true -> Right end);
 treewalker({digit,Position,Value},Map)->
   Value.
