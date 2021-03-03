@@ -17,14 +17,16 @@ runtask(Path) ->
   Spec = yamerl_constr:file(Path),
   UnnestedSpec = lists:nth(1,Spec),
   logger:warning("Starting execution of ~p",[element(2,lists:keyfind("name",1,UnnestedSpec))]),
-  execute(element(2,lists:keyfind("graphs",1,UnnestedSpec)))
-.
+  execute(element(2,lists:keyfind("graphs",1,UnnestedSpec))).
+
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
 
 
 execute(Spec)->
-  lists:map(fun(Document)-> executeMapping(Document) end,Spec)
-.
+  %% Find the Start Mapping and execute it.
+  StartSpec = lists:keyfind("start",1,Spec),
+  io:format("Mapping for Start is: ~p ~n~n",[StartSpec]),
+  lists:map(fun(Document)-> executeMapping(Document) end,Spec).
 
 executeMapping({_,Mapping})->
   lists:map(fun(Task)-> executeTask(Task) end, Mapping).

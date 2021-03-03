@@ -39,13 +39,13 @@ treewalker({variable,VariableString},Map)->
   VariableName = treewalker(VariableString,Map),
   maps:get(VariableName,Map);
 treewalker({key_lookup,MapName,KeyName},Map)->
-  ChildMap = maps:get(treewalker(MapName,Map),Map),
-  {_,Value} = lists:keyfind(atom_to_list(treewalker(KeyName,Map)),1,ChildMap),
+  MapMap = treewalker(MapName,Map),
+  {_,Value} = lists:keyfind(atom_to_list(treewalker(KeyName,Map)),1,MapMap),
   Value;
 treewalker({arraylookup,Array,Index},Map)->
-  FlowMapArray = maps:get(treewalker(Array,Map),Map),
+  MapArray = treewalker(Array,Map),
   ArrayIndex = treewalker(Index,Map),
-  lists:nth(ArrayIndex,FlowMapArray);
+  lists:nth(ArrayIndex,MapArray);
 treewalker({concat,Part1,Part2},Map)->
   Left= treewalker(Part1,Map),
   Right = treewalker(Part2,Map),

@@ -14,7 +14,7 @@ graphs:
       put: alphabet
       target: "runner2@127.0.0.1"
     - type: echo
-      value: "{alphabet}[2] on the console"
+      value: "{{alphabet}}[2] on the console"
       put: alphabet2
       target: "runner2@127.0.0.1"
     - type: echo
@@ -22,6 +22,6 @@ graphs:
       put: io
       target: "runner3@127.0.0.1"
     - type: echo
-      value: "{name_map@age} by the runner"
+      value: "{{name_map}@age} by the runner"
       put: io
       target: "runner1@127.0.0.1"
