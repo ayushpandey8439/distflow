@@ -69,6 +69,12 @@ handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
 handle_call({update_map,Map,Clock}, _From, State = #controller_state{}) ->
   {reply, Map, State#controller_state{flow_map = Map}};
 
+handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
+  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
+  UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
 handle_call(_Request, _From, State = #controller_state{}) ->
   {reply, ok, State}.
 

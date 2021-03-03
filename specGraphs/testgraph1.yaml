@@ -1,11 +1,15 @@
-name: Test
-start: "task1"
+name: Test_replace
+start: "start"
 graphs:
   start:
     - type: echo
       value: "Final Data to be print"
       put: final_data
       target: "runner1@127.0.0.1"
+    - type: replace
+      variable: final_data
+      value:  "Modified final_data"
+      target: "runner2@127.0.0.1"
     - type: echo
       value: "{final_data}"
       put: io
