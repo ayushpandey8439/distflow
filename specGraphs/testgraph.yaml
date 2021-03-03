@@ -1,10 +1,17 @@
 name: Test
+start: "start"
 graphs:
   start:
     - type: echo
       value: "Final Data to be print"
       put: final_data
       target: "runner1@127.0.0.1"
+    - type: echo
+      value: "{final_data}"
+      put: io
+      target: "runner2@127.0.0.1"
+      goTo: "task2"
+  task1:
     - type: echo
       value: {name: "ayush", age: "25"}
       put: name_map
@@ -25,3 +32,9 @@ graphs:
       value: "{{name_map}@age} by the runner"
       put: io
       target: "runner1@127.0.0.1"
+  task2:
+    - type: echo
+      value: "task1 should be skipped"
+      put: io
+      target: "runner1@127.0.0.1"
+
