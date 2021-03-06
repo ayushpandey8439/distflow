@@ -17,6 +17,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
+-export([getFlowMap/0]).
 
 -define(SERVER, ?MODULE).
 
@@ -74,7 +75,8 @@ handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
   UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
+handle_call(getMap,_From,  State = #controller_state{}) ->
+  {reply, {ok,State#controller_state.flow_map} , State};
 handle_call(_Request, _From, State = #controller_state{}) ->
   {reply, ok, State}.
 
@@ -117,3 +119,6 @@ code_change(_OldVsn, State = #controller_state{}, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+getFlowMap()->
+  gen_server:call({controller,node()},getMap).
