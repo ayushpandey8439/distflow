@@ -1,0 +1,35 @@
+name: Test
+start: "start"
+graphs:
+  start:
+    - type: echo
+      value: "Final Data to be print"
+      put: final_data
+      target: "runner2@127.0.0.1"
+    - type: echo
+      value: "{final_data}"
+      put: io
+      target: "runner2@127.0.0.1"
+  forking:
+    - type: fork
+      forkTargets: [A,B]
+      joinKey: join
+      target: "runner2@127.0.0.1"
+  A:
+    - type: echo
+      value: "Fork A Value"
+      put: io
+      target: "runner3@127.0.0.1"
+      goTo: J
+  B:
+    - type: echo
+      value: "Fork B Value"
+      put: io
+      target: "runner2@127.0.0.1"
+      goTo: J
+  J:
+    - type: echo
+      value: "Fork Complete"
+      key: {join: }
+      put: io
+      target: "runner2@127.0.0.1"
