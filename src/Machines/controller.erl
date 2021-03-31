@@ -78,15 +78,17 @@ handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
 
 handle_call({fork,JoinKey,ForkTargets},_From,  State = #controller_state{}) ->
   UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
-  JoinMap = [],
-  UpdatedMap = maps:put(JoinKey,JoinMap,State#controller_state.flow_map),
+  UpdatedMap = maps:put(JoinKey,#{length => length(ForkTargets)},State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({join,JoinKey,Keys},_From,  State = #controller_state{}) ->
   UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
+  UpdatedMap = putKeyInJoinList(Keys,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  JoinStatus = checkJoinComplete(JoinKey,Keys,UpdatedMap),
+  {reply,JoinStatus,State#controller_state{flow_map = UpdatedMap}};
 
-  ok.
 
 handle_call(getMap,_From,  State = #controller_state{}) ->
   {reply, {ok,State#controller_state.flow_map} , State};
@@ -99,7 +101,7 @@ handle_call(_Request, _From, State = #controller_state{}) ->
   {noreply, NewState :: #controller_state{}} |
   {noreply, NewState :: #controller_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #controller_state{}}).
-handle_cast(_Request, State = #controller_state{}) ->
+handle_cast({clearState}, State = #controller_state{}) ->
   {noreply, State}.
 
 %% @private
@@ -135,3 +137,23 @@ code_change(_OldVsn, State = #controller_state{}, _Extra) ->
 
 getFlowMap()->
   gen_server:call({controller,node()},getMap).
+
+putKeyInJoinList([KeyList],FlowMap) ->
+  SourceKey = list_to_atom(element(1,KeyList)),
+  TargetList = element(2,KeyList),
+  SourceValue = maps:get(SourceKey,FlowMap),
+  InitialJoinList = maps:get(TargetList,FlowMap,[]),
+  NewJoinList = lists:append(InitialJoinList,[SourceValue]),
+  UpdatedMap = maps:put(TargetList,NewJoinList,FlowMap),
+  UpdatedMap.
+
+checkJoinComplete(JoinMap,[KeyList],FlowMap)->
+  TargetList = element(2,KeyList),
+  TargetLength = maps:get('length',JoinMap),
+  CurrentLength = length(maps:get(TargetList,FlowMap,[])),
+  if
+  TargetLength > CurrentLength ->
+    wait;
+  true ->
+    join_complete
+  end.

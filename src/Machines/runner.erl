@@ -4,34 +4,145 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 14. Feb 2021 20:10
+%%% Created : 31. Mar 2021 03:18
 %%%-------------------------------------------------------------------
 -module(runner).
 -author("pandey").
 
+-behaviour(gen_server).
+
 %% API
+-export([start_link/0]).
+
+%% gen_server callbacks
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
+  code_change/3]).
 -export([echo/2,replace/2,fork/2,join/2]).
+-define(SERVER, ?MODULE).
+name() ->runner.
+-record(runner_state, {}).
+
+%%%===================================================================
+%%% API
+%%%===================================================================
+
+%% @doc Spawns the server and registers the local name (unique)
+-spec(start_link() ->
+  {ok, Pid :: pid()} | ignore | {error, Reason :: term()}).
+start_link() ->
+  gen_server:start_link({local, name()}, ?MODULE, [], []).
+
+%%%===================================================================
+%%% gen_server callbacks
+%%%===================================================================
+
+%% @private
+%% @doc Initializes the server
+-spec(init(Args :: term()) ->
+  {ok, State :: #runner_state{}} | {ok, State :: #runner_state{}, timeout() | hibernate} |
+  {stop, Reason :: term()} | ignore).
+init([]) ->
+  {ok, #runner_state{}}.
+
+%% @private
+%% @doc Handling call messages
+-spec(handle_call(Request :: term(), From :: {pid(), Tag :: term()},
+    State :: #runner_state{}) ->
+  {reply, Reply :: term(), NewState :: #runner_state{}} |
+  {reply, Reply :: term(), NewState :: #runner_state{}, timeout() | hibernate} |
+  {noreply, NewState :: #runner_state{}} |
+  {noreply, NewState :: #runner_state{}, timeout() | hibernate} |
+  {stop, Reason :: term(), Reply :: term(), NewState :: #runner_state{}} |
+  {stop, Reason :: term(), NewState :: #runner_state{}}).
+handle_call(_Request, _From, State = #runner_state{}) ->
+  {reply, ok, State};
+handle_call({getJoinLength,JoinKey}, _From, State = #runner_state{}) ->
+  JoinLength = maps:get(JoinKey,State),
+  {reply, {ok,JoinLength}, State}.
+%% @private
+%% @doc Handling cast messages
+-spec(handle_cast(Request :: term(), State :: #runner_state{}) ->
+  {noreply, NewState :: #runner_state{}} |
+  {noreply, NewState :: #runner_state{}, timeout() | hibernate} |
+  {stop, Reason :: term(), NewState :: #runner_state{}}).
+handle_cast(_Request, State = #runner_state{}) ->
+  {noreply, State};
+handle_cast({setJoinLength,JoinKey,Length}, State = #runner_state{}) ->
+  UpdatedState = maps:put(JoinKey,Length,State),
+  {noreply, ok, UpdatedState}.
+%% @private
+%% @doc Handling all non call/cast messages
+-spec(handle_info(Info :: timeout() | term(), State :: #runner_state{}) ->
+  {noreply, NewState :: #runner_state{}} |
+  {noreply, NewState :: #runner_state{}, timeout() | hibernate} |
+  {stop, Reason :: term(), NewState :: #runner_state{}}).
+handle_info(_Info, State = #runner_state{}) ->
+  {noreply, State}.
+
+%% @private
+%% @doc This function is called by a gen_server when it is about to
+%% terminate. It should be the opposite of Module:init/1 and do any
+%% necessary cleaning up. When it returns, the gen_server terminates
+%% with Reason. The return value is ignored.
+-spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
+    State :: #runner_state{}) -> term()).
+terminate(_Reason, _State = #runner_state{}) ->
+  ok.
+
+%% @private
+%% @doc Convert process state when code is changed
+-spec(code_change(OldVsn :: term() | {down, term()}, State :: #runner_state{},
+    Extra :: term()) ->
+  {ok, NewState :: #runner_state{}} | {error, Reason :: term()}).
+code_change(_OldVsn, State = #runner_state{}, _Extra) ->
+  {ok, State}.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
+
+
 
 echo(Target,Task)->
-  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
-  Put = (element(2,lists:keyfind("put",1,TemplatedTask))),
-  gen_server:call(Target, {echo,Put,Value}).
+    TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+    Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
+    Put = (element(2,lists:keyfind("put",1,TemplatedTask))),
+    gen_server:call(Target, {echo,Put,Value}),
+    nextTask(TemplatedTask).
 
 replace(Target, Task)->
-  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
-  Variable = (element(2,lists:keyfind("variable",1,TemplatedTask))),
-  gen_server:call(Target, {replace,Variable,Value}).
+    TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+    Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
+    Variable = (element(2,lists:keyfind("variable",1,TemplatedTask))),
+    gen_server:call(Target, {replace,Variable,Value}).
 
 fork(Target,Task) ->
-  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
-  ForkTargets = (element(2,lists:keyfind("forkTargets",1,TemplatedTask))),
-  gen_server:call(Target,{fork,JoinKey,ForkTargets}).
+    TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+    JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
+    ForkTargets = (element(2,lists:keyfind("forkTargets",1,TemplatedTask))),
+    gen_server:cast(self(),{setJoinLength,JoinKey,length(ForkTargets)}),
+    gen_server:call(Target,{fork,JoinKey,ForkTargets}),
+    {fork, ForkTargets}.
 
 join(Target, Task) ->
-  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
-  Keys = (element(2,lists:keyfind("keys",1,TemplatedTask))),
-  gen_server:call(Target,{join,JoinKey,Keys}).
+    TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+    JoinTarget = (element(2,lists:keyfind("joinTarget",1,TemplatedTask))),
+    JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
+    Keys = (element(2,lists:keyfind("keys",1,TemplatedTask))),
+    case gen_server:call(Target,{join,JoinKey,Keys}) of
+      wait ->
+        wait;
+      join_complete ->
+        {goto,atom_to_list(JoinTarget)}
+    end.
+
+
+nextTask(TaskTemplate) ->
+    case lists:keyfind("goTo",1,TaskTemplate) of
+        {Key, Value} when is_atom(Value) -> {goto, atom_to_list(Value)};
+        {Key, Value} when is_list(Value) -> {goto, Value};
+        false -> next_task
+    end.
+
+resetState()->
+  ok.

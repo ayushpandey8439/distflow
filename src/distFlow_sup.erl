@@ -45,7 +45,15 @@ init([]) ->
     type => supervisor,
     modules => [message_broker]
   },
-    ChildSpecs = [NodeController,MessageBroker],
+  Runner = #{
+    id => runner,
+    start => {runner, start_link,[]},
+    restart => permanent,
+    shutdown => 5000,
+    type => supervisor,
+    modules => [runner]
+  },
+    ChildSpecs = [NodeController,MessageBroker,Runner],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

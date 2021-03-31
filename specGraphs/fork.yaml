@@ -12,8 +12,8 @@ graphs:
       target: "runner2@127.0.0.1"
   forking:
     - type: fork
-      forkTargets: [A]
-      joinKey: joinkey
+      forkTargets: [A,B]
+      joinKey: join2
       target: "runner2@127.0.0.1"
   A:
     - type: echo
@@ -21,9 +21,20 @@ graphs:
       put: k
       target: "runner2@127.0.0.1"
       goTo: JoinTarget
-
+  B:
+    - type: echo
+      value: "World"
+      put: k
+      target: "runner2@127.0.0.1"
+      goTo: JoinTarget
   JoinTarget:
     - type: join
       keys: {k: klist}
-      joinKey: "{joinkey}"
+      joinKey: "{join2}"
+      joinTarget: Flatten
       target: "runner1@127.0.0.1"
+  Flatten:
+    - type: echo
+      value: "{klist}"
+      put: io
+      target: "runner3@127.0.0.1"

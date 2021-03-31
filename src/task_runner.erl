@@ -38,20 +38,23 @@ execute(Index,SpecNameList,SpecList) when length(SpecList) >= Index->
       NextSpecIndex = getIndex(SpecName, SpecNameList,1 ),
       execute(NextSpecIndex,SpecNameList,SpecList);
     {next_mapping} ->
-      execute(Index+1,SpecNameList,SpecList)
+      execute(Index+1,SpecNameList,SpecList);
+    wait ->
+      wait
   end;
 execute(Index,SpecNameList,SpecList) when length(SpecList) < Index ->
   {next_graph}.
 
 executeMapping(Index, Mapping) when length(Mapping) >= Index->
-  executeTask(lists:nth(Index,Mapping)),
-  case getNextTask(lists:nth(Index,Mapping)) of
+  case executeTask(lists:nth(Index,Mapping)) of
     {goto, NextTask} ->
       {goto,NextTask};
-    {fork, NextTask} ->
-      {fork,NextTask};
+    {fork, ForkTargets} ->
+      {fork,ForkTargets};
     next_task ->
-      executeMapping(Index+1,Mapping)
+      executeMapping(Index+1,Mapping);
+    wait ->
+      wait
     end;
 executeMapping(Index, Mapping) when length(Mapping) < Index->
   {next_mapping}.
@@ -60,7 +63,8 @@ executeMapping(Index, Mapping) when length(Mapping) < Index->
 executeTask(Task)->
   Target = list_to_atom(element(2,lists:keyfind("target",1,Task))),
   TaskName = list_to_atom(string:lowercase(element(2,lists:keyfind("type",1,Task)))),
-  apply(runner,TaskName,[{controller,Target},Task]).
+  Result = apply(runner,TaskName,[{controller,Target},Task]),
+  Result.
 
 
 getStartSpec(Spec)->
@@ -68,19 +72,6 @@ getStartSpec(Spec)->
     {Key, Value} ->
       Value;
     true -> "start"
-  end.
-
-getNextTask(Task)->
-  case lists:keyfind("goTo",1,Task) of
-    {Key, Value} ->
-      {goto,Value};
-    false ->
-      case lists:keyfind("forkTargets",1,Task) of
-        {Key, Targets} ->
-          {fork,Targets};
-        false ->
-          next_task
-      end
   end.
 
 getIndex(Name, [Head|RestList],Index) when Head == Name->
@@ -92,5 +83,8 @@ getIndex(Name, [],Index = 1)->
 
 
 executeForkTarget(TargetTask,SpecNameList,SpecList)->
-TaskIndex = getIndex(TargetTask, SpecNameList,1),
-execute(TaskIndex,SpecNameList,SpecList).
+  TaskIndex = getIndex(TargetTask, SpecNameList,1),
+  execute(TaskIndex,SpecNameList,SpecList).
+
+resetState()->
+  apply(runner,resetState).
