@@ -102,7 +102,10 @@ handle_call(_Request, _From, State = #controller_state{}) ->
   {noreply, NewState :: #controller_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #controller_state{}}).
 handle_cast({clearState}, State = #controller_state{}) ->
-  {noreply, State}.
+  Clock = vector_clock:new(),
+  Flow_map = maps:new(),
+  gen_server:call({message_broker,node()},{broadcast,Flow_map,Clock}),
+  {noreply, State#controller_state{clock = Clock, flow_map = Flow_map}}.
 
 %% @private
 %% @doc Handling all non call/cast messages

@@ -18,6 +18,7 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
 -export([echo/2,replace/2,fork/2,join/2]).
+-export([resetState/1]).
 -define(SERVER, ?MODULE).
 name() ->runner.
 -record(runner_state, {}).
@@ -144,5 +145,5 @@ nextTask(TaskTemplate) ->
         false -> next_task
     end.
 
-resetState()->
-  ok.
+resetState(Target)->
+  gen_server:cast(Target,{clearState}).

@@ -21,7 +21,8 @@ runtask(Path) ->
   {TaskNameList, TaskList} = lists:unzip(SpecList),
   StartSpecName = getStartSpec(UnnestedSpec),
   StartIndex = getIndex(StartSpecName,TaskNameList,1),
-  execute(StartIndex,TaskNameList,TaskList).
+  execute(StartIndex,TaskNameList,TaskList),
+  resetState().
 
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph3.yaml").
@@ -87,4 +88,4 @@ executeForkTarget(TargetTask,SpecNameList,SpecList)->
   execute(TaskIndex,SpecNameList,SpecList).
 
 resetState()->
-  apply(runner,resetState).
+  apply(runner,resetState,[controller]).
