@@ -1,0 +1,34 @@
+name: Test
+start: "start"
+graphs:
+  start:
+    - type: echo
+      value: "Final Data to be print"
+      put: final_data
+      target: "b@Ayushs-MacBook-Air"
+    - type: echo
+      value: "{final_data}"
+      put: io
+      target: "a@Ayushs-MacBook-Air"
+  forking:
+    - type: fork
+      forkTargets: [A,B]
+      joinKey: joinkey
+      target: "a@Ayushs-MacBook-Air"
+  A:
+    - type: echo
+      value: "Fork A Value"
+      put: k
+      target: "c@Ayushs-MacBook-Air"
+      goTo: JoinTarget
+  B:
+    - type: echo
+      value: "Fork B Value"
+      put: k
+      target: "b@Ayushs-MacBook-Air"
+      goTo: JoinTarget
+  JoinTarget:
+    - type: echo
+      keys: {k: klist}
+      joinKey: "{joinkey}"
+      target: "a@Ayushs-MacBook-Air"

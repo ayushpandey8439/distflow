@@ -5,14 +5,14 @@ graphs:
     - type: echo
       value: "Final Data to be print"
       put: final_data
-      target: "runner1@Ayushs-MacBook-Air"
+      target: "b@Ayushs-MacBook-Air"
     - type: echo
       value: "{final_data}"
       put: io
-      target: "runner2@Ayushs-MacBook-Air"
+      target: "b@Ayushs-MacBook-Air"
   task2:
     - type: echo
       value: "task1 should be skipped"
       put: io
-      target: "runner1@Ayushs-MacBook-Air"
+      target: "a@Ayushs-MacBook-Air"
 

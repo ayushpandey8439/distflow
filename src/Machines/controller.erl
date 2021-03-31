@@ -75,6 +75,19 @@ handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
   UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
+handle_call({fork,JoinKey,ForkTargets},_From,  State = #controller_state{}) ->
+  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
+  JoinMap = [],
+  UpdatedMap = maps:put(JoinKey,JoinMap,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
+handle_call({join,JoinKey,Keys},_From,  State = #controller_state{}) ->
+  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
+
+  ok.
+
 handle_call(getMap,_From,  State = #controller_state{}) ->
   {reply, {ok,State#controller_state.flow_map} , State};
 handle_call(_Request, _From, State = #controller_state{}) ->

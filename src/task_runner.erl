@@ -21,16 +21,19 @@ runtask(Path) ->
   {TaskNameList, TaskList} = lists:unzip(SpecList),
   StartSpecName = getStartSpec(UnnestedSpec),
   StartIndex = getIndex(StartSpecName,TaskNameList,1),
-  io:format("Start index is:: ~p ~n ~n ",[StartIndex]),
   execute(StartIndex,TaskNameList,TaskList).
 
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
+  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph3.yaml").
+  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
 
 
 execute(Index,SpecNameList,SpecList) when length(SpecList) >= Index->
   Spec = lists:nth(Index,SpecList),
   %% Find the Start Mapping and execute it.
   case executeMapping(1,Spec) of
+    {fork,TargetList} ->
+      lists:foreach(fun(TargetTask) -> executeForkTarget(TargetTask,SpecNameList,SpecList)end ,TargetList);
     {goto,SpecName} ->
       NextSpecIndex = getIndex(SpecName, SpecNameList,1 ),
       execute(NextSpecIndex,SpecNameList,SpecList);
@@ -45,6 +48,8 @@ executeMapping(Index, Mapping) when length(Mapping) >= Index->
   case getNextTask(lists:nth(Index,Mapping)) of
     {goto, NextTask} ->
       {goto,NextTask};
+    {fork, NextTask} ->
+      {fork,NextTask};
     next_task ->
       executeMapping(Index+1,Mapping)
     end;
@@ -70,7 +75,12 @@ getNextTask(Task)->
     {Key, Value} ->
       {goto,Value};
     false ->
-      next_task
+      case lists:keyfind("forkTargets",1,Task) of
+        {Key, Targets} ->
+          {fork,Targets};
+        false ->
+          next_task
+      end
   end.
 
 getIndex(Name, [Head|RestList],Index) when Head == Name->
@@ -79,3 +89,8 @@ getIndex(Name, [Head|RestList],Index) when Head =/= Name ->
   getIndex(Name, RestList,Index+1);
 getIndex(Name, [],Index = 1)->
   -1.
+
+
+executeForkTarget(TargetTask,SpecNameList,SpecList)->
+TaskIndex = getIndex(TargetTask, SpecNameList,1),
+execute(TaskIndex,SpecNameList,SpecList).

@@ -12,24 +12,18 @@ graphs:
       target: "runner2@127.0.0.1"
   forking:
     - type: fork
-      forkTargets: [A,B]
-      joinKey: join
+      forkTargets: [A]
+      joinKey: joinkey
       target: "runner2@127.0.0.1"
   A:
     - type: echo
-      value: "Fork A Value"
-      put: io
-      target: "runner3@127.0.0.1"
-      goTo: J
-  B:
-    - type: echo
-      value: "Fork B Value"
-      put: io
+      value: "Hello"
+      put: k
       target: "runner2@127.0.0.1"
-      goTo: J
-  J:
-    - type: echo
-      value: "Fork Complete"
-      key: {join: }
-      put: io
-      target: "runner2@127.0.0.1"
+      goTo: JoinTarget
+
+  JoinTarget:
+    - type: join
+      keys: {k: klist}
+      joinKey: "{joinkey}"
+      target: "runner1@127.0.0.1"
