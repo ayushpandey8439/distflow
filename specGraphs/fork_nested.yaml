@@ -46,10 +46,10 @@ graphs:
       joinTarget: Flatten1
       target: "runner1@127.0.0.1"
   Flatten1:
-    - type: echo
-      value: "{klist1}"
-      put: k
-      target: "runner3@127.0.0.1"
+    - type: flattenStringList
+      list: "{klist1}"
+      string: k
+      target: "runner1@127.0.0.1"
   JoinTarget:
     - type: join
       keys: {k: klist}
@@ -57,8 +57,13 @@ graphs:
       joinTarget: Flatten
       target: "runner1@127.0.0.1"
   Flatten:
+    - type: flattenStringList
+      list: "{klist}"
+      string: FinalString
+      target: "runner1@127.0.0.1"
+
     - type: echo
-      value: "{klist}"
+      value: "{FinalString}"
       put: io
       target: "runner3@127.0.0.1"
 

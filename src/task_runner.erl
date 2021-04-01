@@ -62,7 +62,7 @@ executeMapping(Index, Mapping) when length(Mapping) < Index->
 
 executeTask(Task)->
   Target = list_to_atom(element(2,lists:keyfind("target",1,Task))),
-  TaskName = list_to_atom(string:lowercase(element(2,lists:keyfind("type",1,Task)))),
+  TaskName = list_to_atom(element(2,lists:keyfind("type",1,Task))),
   Result = apply(runner,TaskName,[{controller,Target},Task]),
   Result.
 

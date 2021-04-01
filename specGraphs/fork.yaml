@@ -17,13 +17,13 @@ graphs:
       target: "runner2@127.0.0.1"
   A:
     - type: echo
-      value: "Hello"
+      value: "Hello "
       put: k1
       target: "runner2@127.0.0.1"
       goTo: JoinTarget
   B:
     - type: echo
-      value: "World"
+      value: "World ! "
       put: k1
       target: "runner2@127.0.0.1"
       goTo: JoinTarget
@@ -34,7 +34,13 @@ graphs:
       joinTarget: Flatten
       target: "runner1@127.0.0.1"
   Flatten:
+    - type: flattenStringList
+      list: "{klist}"
+      string: output
+      goTo: Out
+      target: "runner1@127.0.0.1"
+  Out:
     - type: echo
-      value: "{klist}"
-      put: io
+      put : io
+      value: "{output}"
       target: "runner3@127.0.0.1"

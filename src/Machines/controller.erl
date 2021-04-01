@@ -89,6 +89,12 @@ handle_call({join,JoinKey,Keys},_From,  State = #controller_state{}) ->
   JoinStatus = checkJoinComplete(JoinKey,Keys,UpdatedMap),
   {reply,JoinStatus,State#controller_state{flow_map = UpdatedMap}};
 
+handle_call({flattenStringList,List,String}, _From, State = #controller_state{}) ->
+  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
+  FlatList = flattenStringList:flattenStringList(List),
+  UpdatedMap = echo:echo(String,FlatList,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap,clock = UpdatedClock}};
 
 handle_call(getMap,_From,  State = #controller_state{}) ->
   {reply, {ok,State#controller_state.flow_map} , State};
