@@ -25,7 +25,7 @@ runtask(Path) ->
   resetState().
 
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
-  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph3.yaml").
+  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
 
 
@@ -59,7 +59,6 @@ executeMapping(Index, Mapping) when length(Mapping) >= Index->
     end;
 executeMapping(Index, Mapping) when length(Mapping) < Index->
   {next_mapping}.
-
 
 executeTask(Task)->
   Target = list_to_atom(element(2,lists:keyfind("target",1,Task))),

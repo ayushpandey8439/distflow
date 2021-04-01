@@ -55,11 +55,15 @@ init([]) ->
   {noreply, NewState :: #runner_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), Reply :: term(), NewState :: #runner_state{}} |
   {stop, Reason :: term(), NewState :: #runner_state{}}).
-handle_call(_Request, _From, State = #runner_state{}) ->
-  {reply, ok, State};
-handle_call({getJoinLength,JoinKey}, _From, State = #runner_state{}) ->
+handle_call({getJoinLength,JoinKey}, _From, State = #runner_state{}) when is_atom(JoinKey) ->
+  JoinKeyString = atom_to_list(JoinKey),
+  JoinLength = maps:get(JoinKeyString,State),
+  {reply, {ok,JoinLength}, State};
+handle_call({getJoinLength,JoinKey}, _From, State = #runner_state{})->
   JoinLength = maps:get(JoinKey,State),
-  {reply, {ok,JoinLength}, State}.
+  {reply, {ok,JoinLength}, State};
+handle_call(_Request, _From, State = #runner_state{}) ->
+  {reply, ok, State}.
 %% @private
 %% @doc Handling cast messages
 -spec(handle_cast(Request :: term(), State :: #runner_state{}) ->
@@ -134,14 +138,13 @@ join(Target, Task) ->
       wait ->
         wait;
       join_complete ->
-        {goto,atom_to_list(JoinTarget)}
+        {goto,(JoinTarget)}
     end.
 
 
 nextTask(TaskTemplate) ->
     case lists:keyfind("goTo",1,TaskTemplate) of
-        {Key, Value} when is_atom(Value) -> {goto, atom_to_list(Value)};
-        {Key, Value} when is_list(Value) -> {goto, Value};
+        {Key, Value} -> {goto, Value};
         false -> next_task
     end.
 

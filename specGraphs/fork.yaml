@@ -18,18 +18,18 @@ graphs:
   A:
     - type: echo
       value: "Hello"
-      put: k
+      put: k1
       target: "runner2@127.0.0.1"
       goTo: JoinTarget
   B:
     - type: echo
       value: "World"
-      put: k
+      put: k1
       target: "runner2@127.0.0.1"
       goTo: JoinTarget
   JoinTarget:
     - type: join
-      keys: {k: klist}
+      keys: {k1: klist}
       joinKey: "{join2}"
       joinTarget: Flatten
       target: "runner1@127.0.0.1"

@@ -12,10 +12,10 @@
 %% API
 -export([echo/3]).
 
-echo(io,Value,Map)->
+echo(Put,Value,Map) when Put == "io" ->
   io:format("~p ~n",[Value]),
  Map;
 
-echo(Put,Value,Map)->
+echo(Put,Value,Map) when Put =/= "io" ->
   UpdatedMap = maps:put(Put,Value,Map),
   UpdatedMap.

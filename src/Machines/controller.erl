@@ -142,7 +142,7 @@ getFlowMap()->
   gen_server:call({controller,node()},getMap).
 
 putKeyInJoinList([KeyList],FlowMap) ->
-  SourceKey = list_to_atom(element(1,KeyList)),
+  SourceKey = (element(1,KeyList)),
   TargetList = element(2,KeyList),
   SourceValue = maps:get(SourceKey,FlowMap),
   InitialJoinList = maps:get(TargetList,FlowMap,[]),

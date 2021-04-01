@@ -1,0 +1,64 @@
+name: Test
+start: "start"
+graphs:
+  start:
+    - type: echo
+      value: "Final Data to be print"
+      put: final_data
+      target: "runner2@127.0.0.1"
+    - type: echo
+      value: "{final_data}"
+      put: io
+      target: "runner2@127.0.0.1"
+  forking:
+    - type: fork
+      forkTargets: [A,B]
+      joinKey: join
+      target: "runner2@127.0.0.1"
+  A:
+    - type: fork
+      forkTargets: [ C,D ]
+      joinKey: join2
+      target: "runner2@127.0.0.1"
+  B:
+    - type: echo
+      value: "World"
+      put: k
+      target: "runner3@127.0.0.1"
+      goTo: JoinTarget
+
+  C:
+    - type: echo
+      value: "Hello1"
+      put: k1
+      target: "runner3@127.0.0.1"
+      goTo: JoinTarget1
+  D:
+    - type: echo
+      value: "World1"
+      put: k1
+      target: "runner3@127.0.0.1"
+      goTo: JoinTarget1
+  JoinTarget1:
+    - type: join
+      keys: { k1: klist1 }
+      joinKey: "{join2}"
+      joinTarget: Flatten1
+      target: "runner1@127.0.0.1"
+  Flatten1:
+    - type: echo
+      value: "{klist1}"
+      put: k
+      target: "runner3@127.0.0.1"
+  JoinTarget:
+    - type: join
+      keys: {k: klist}
+      joinKey: "{join2}"
+      joinTarget: Flatten
+      target: "runner1@127.0.0.1"
+  Flatten:
+    - type: echo
+      value: "{klist}"
+      put: io
+      target: "runner3@127.0.0.1"
+

@@ -1,4 +1,4 @@
--file("/usr/local/Cellar/erlang/23.2.7/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 0).
+-file("/usr/local/Cellar/erlang/23.3.1/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 0).
 %% The source of this file is part of leex distribution, as such it
 %% has the same Copyright as the other files in the leex
 %% distribution. The Copyright is defined in the accompanying file
@@ -14,11 +14,11 @@
 %% User code. This is placed here to allow extra attributes.
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 22).
 
-atom(TokenChars) -> list_to_atom(TokenChars).
+atom(TokenChars) -> (TokenChars).
 
 strip(TokenChars,TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).
--file("/usr/local/Cellar/erlang/23.2.7/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 14).
+-file("/usr/local/Cellar/erlang/23.3.1/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 14).
 
 format_error({illegal,S}) -> ["illegal characters ",io_lib:write_string(S)];
 format_error({user,S}) -> S.
@@ -391,27 +391,27 @@ yyaction(_, _, _, _) -> error.
 -compile({inline,yyaction_0/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 12).
 yyaction_0(TokenChars, TokenLine) ->
-     { token, { keylookup, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { keylookup, TokenLine, (TokenChars) } } .
 
 -compile({inline,yyaction_1/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 13).
 yyaction_1(TokenChars, TokenLine) ->
-     { token, { bracketopen, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { bracketopen, TokenLine, (TokenChars) } } .
 
 -compile({inline,yyaction_2/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 14).
 yyaction_2(TokenChars, TokenLine) ->
-     { token, { bracketclose, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { bracketclose, TokenLine, (TokenChars) } } .
 
 -compile({inline,yyaction_3/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 15).
 yyaction_3(TokenChars, TokenLine) ->
-     { token, { braceopen, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { braceopen, TokenLine, (TokenChars) } } .
 
 -compile({inline,yyaction_4/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 16).
 yyaction_4(TokenChars, TokenLine) ->
-     { token, { braceclose, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { braceclose, TokenLine, (TokenChars) } } .
 
 -compile({inline,yyaction_5/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 17).
@@ -421,6 +421,6 @@ yyaction_5(TokenChars, TokenLine) ->
 -compile({inline,yyaction_6/2}).
 -file("/Users/pandey/Desktop/Notes/thesis/distflow/src/TemplateEngine/Grammar/tokens.xrl", 18).
 yyaction_6(TokenChars, TokenLine) ->
-     { token, { string, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { string, TokenLine, (TokenChars) } } .
 
--file("/usr/local/Cellar/erlang/23.2.7/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 313).
+-file("/usr/local/Cellar/erlang/23.3.1/lib/erlang/lib/parsetools-2.2/include/leexinc.hrl", 313).

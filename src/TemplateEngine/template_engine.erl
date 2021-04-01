@@ -40,7 +40,7 @@ treewalker({variable,VariableString},Map)->
   maps:get(VariableName,Map);
 treewalker({key_lookup,MapName,KeyName},Map)->
   MapMap = treewalker(MapName,Map),
-  {_,Value} = lists:keyfind(atom_to_list(treewalker(KeyName,Map)),1,MapMap),
+  {_,Value} = lists:keyfind(treewalker(KeyName,Map),1,MapMap),
   Value;
 treewalker({arraylookup,Array,Index},Map)->
   MapArray = treewalker(Array,Map),

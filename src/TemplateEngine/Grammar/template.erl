@@ -1,7 +1,7 @@
 -module(template).
 -export([parse/1, parse_and_scan/1, format_error/1]).
 
--file("/usr/local/Cellar/erlang/23.1.2/lib/erlang/lib/parsetools-2.2/include/yeccpre.hrl", 0).
+-file("/usr/local/Cellar/erlang/23.2.7/lib/erlang/lib/parsetools-2.2/include/yeccpre.hrl", 0).
 %%
 %% %CopyrightBegin%
 %%

@@ -11,17 +11,17 @@ WhiteSpace =
 
 
 Rules.
-{KeyLookup} :   {token,{keylookup,TokenLine,list_to_atom(TokenChars)}}.
-{BracketOpen}   : {token,{bracketopen,TokenLine,list_to_atom(TokenChars)}}.
-{BracketClose}    : {token,{bracketclose,TokenLine,list_to_atom(TokenChars)}}.
-{BraceOpen}    : {token,{braceopen,TokenLine,list_to_atom(TokenChars)}}.
-{BraceClose}    : {token,{braceclose,TokenLine,list_to_atom(TokenChars)}}.
+{KeyLookup} :   {token,{keylookup,TokenLine,(TokenChars)}}.
+{BracketOpen}   : {token,{bracketopen,TokenLine,(TokenChars)}}.
+{BracketClose}    : {token,{bracketclose,TokenLine,(TokenChars)}}.
+{BraceOpen}    : {token,{braceopen,TokenLine,(TokenChars)}}.
+{BraceClose}    : {token,{braceclose,TokenLine,(TokenChars)}}.
 {Digits}+   : {token,{digit,TokenLine,list_to_integer(TokenChars)}}.
-{Letters}+   : {token,{string,TokenLine,list_to_atom(TokenChars)}}.
+{Letters}+   : {token,{string,TokenLine,(TokenChars)}}.
 
 Erlang code.
 
-atom(TokenChars) -> list_to_atom(TokenChars).
+atom(TokenChars) -> (TokenChars).
 
 strip(TokenChars,TokenLen) ->
     lists:sublist(TokenChars, 2, TokenLen - 2).
