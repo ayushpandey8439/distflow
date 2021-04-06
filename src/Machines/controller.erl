@@ -43,9 +43,8 @@ start_link() ->
   {ok, State :: #controller_state{}} | {ok, State :: #controller_state{}, timeout() | hibernate} |
   {stop, Reason :: term()} | ignore).
 init([]) ->
-  Clock = vector_clock:new(),
   Flow_map = maps:new(),
-  {ok, #controller_state{clock = Clock, flow_map = Flow_map}}.
+  {ok, #controller_state{flow_map = Flow_map}}.
 
 %% @private
 %% @doc Handling call messages
@@ -58,43 +57,38 @@ init([]) ->
   {stop, Reason :: term(), Reply :: term(), NewState :: #controller_state{}} |
   {stop, Reason :: term(), NewState :: #controller_state{}}).
 handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
-  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap,clock = UpdatedClock}};
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
   TemplatedTask = template_engine:replace(Task,State#controller_state.flow_map),
   {reply, TemplatedTask, State};
 
-handle_call({update_map,Map,Clock}, _From, State = #controller_state{}) ->
+handle_call({update_map,Map}, _From, State = #controller_state{}) ->
   {reply, Map, State#controller_state{flow_map = Map}};
 
 handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
-  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
   UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({fork,JoinKey,ForkTargets},_From,  State = #controller_state{}) ->
-  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
   UpdatedMap = maps:put(JoinKey,#{length => length(ForkTargets)},State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({join,JoinKey,Keys},_From,  State = #controller_state{}) ->
-  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
   UpdatedMap = putKeyInJoinList(Keys,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   JoinStatus = checkJoinComplete(JoinKey,Keys,UpdatedMap),
   {reply,JoinStatus,State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({flattenStringList,List,String}, _From, State = #controller_state{}) ->
-  UpdatedClock = vector_clock:increment(node(),State#controller_state.clock),
   FlatList = flattenStringList:flattenStringList(List),
   UpdatedMap = echo:echo(String,FlatList,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap,UpdatedClock}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap,clock = UpdatedClock}};
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call(getMap,_From,  State = #controller_state{}) ->
   {reply, {ok,State#controller_state.flow_map} , State};

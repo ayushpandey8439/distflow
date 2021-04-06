@@ -56,12 +56,17 @@ init([]) ->
   {noreply, NewState :: #message_broker_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), Reply :: term(), NewState :: #message_broker_state{}} |
   {stop, Reason :: term(), NewState :: #message_broker_state{}}).
-handle_call({broadcast,Map,Clock}, _From, State = #message_broker_state{}) ->
-  gen_server:multi_call(nodes(),message_broker,{update_map,Map,Clock}),
-  {reply, ok, State};
+handle_call({broadcast,Map}, _From, State = #message_broker_state{}) ->
+  UpdatedClock = vector_clock:increment(State#message_broker_state.clock),
+  gen_server:multi_call(nodes(),message_broker,{update_map,Map,UpdatedClock}),
+  {reply, ok, State#message_broker_state{clock = UpdatedClock}};
+
 handle_call({update_map,Map,Clock}, _From, State = #message_broker_state{}) ->
-  gen_server:call({controller,node()},{update_map,Map,Clock}),
-  {reply, ok, State};
+  UpdatedClock = vector_clock:increment(State#message_broker_state.clock),
+  MergedClock = vector_clock:merge(UpdatedClock,Clock),
+  gen_server:call({controller,node()},{update_map,Map}),
+  {reply, ok, State#message_broker_state{clock = MergedClock}};
+
 handle_call(_Request, _From, State = #message_broker_state{}) ->
   {reply, ok, State}.
 

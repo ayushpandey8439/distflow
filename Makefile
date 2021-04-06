@@ -62,6 +62,7 @@ dev2rel:
 dev3rel:
 	$(REBAR) as dev3 release
 
+
 dev1-console:
 	$(BASEDIR)/_build/dev1/rel/distFlow/bin/distFlow console
 dev2-console:
