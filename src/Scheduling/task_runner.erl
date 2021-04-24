@@ -27,6 +27,7 @@ runtask(Path) ->
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
   %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
+  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
 
 
 execute(Index,SpecNameList,SpecList) when length(SpecList) >= Index->
@@ -61,10 +62,12 @@ executeMapping(Index, Mapping) when length(Mapping) < Index->
   {next_mapping}.
 
 executeTask(Task)->
-  Target = list_to_atom(element(2,lists:keyfind("target",1,Task))),
+  Target = case lists:keyfind("target",1,Task) of
+              false -> node();
+              Tuple -> list_to_atom(element(2,Tuple))
+            end,
   TaskName = list_to_atom(element(2,lists:keyfind("type",1,Task))),
-  Result = apply(runner,TaskName,[{controller,Target},Task]),
-  Result.
+  apply(runner,TaskName,[{controller,Target},Task]).
 
 
 getStartSpec(Spec)->

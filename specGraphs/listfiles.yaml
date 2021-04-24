@@ -1,0 +1,10 @@
+name: convert
+start: "start"
+graphs:
+  start:
+    - type: listfiles
+      folder: "/Users/pandey/Desktop/Notes/thesis/distflow/testCases"
+      output: files
+    - type: echo
+      value: "{files}"
+      put: io

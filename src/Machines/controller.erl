@@ -56,10 +56,21 @@ init([]) ->
   {noreply, NewState :: #controller_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), Reply :: term(), NewState :: #controller_state{}} |
   {stop, Reason :: term(), NewState :: #controller_state{}}).
-handle_call({echo,Put,Value}, _From, State = #controller_state{}) ->
+handle_call({echo,Task}, _From, State = #controller_state{}) ->
+  Value = (element(2,lists:keyfind("value",1,Task))),
+  Put = (element(2,lists:keyfind("put",1,Task))),
+
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
+handle_call({listfiles,Task}, _From, State = #controller_state{}) ->
+  Folder = (element(2,lists:keyfind("folder",1,Task))),
+  TargetVar = (element(2,lists:keyfind("output",1,Task))),
+  UpdatedMap = listfiles:listfiles(Folder,TargetVar,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
 
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
   TemplatedTask = template_engine:replace(Task,State#controller_state.flow_map),
@@ -68,23 +79,31 @@ handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
 handle_call({update_map,Map}, _From, State = #controller_state{}) ->
   {reply, Map, State#controller_state{flow_map = Map}};
 
-handle_call({replace,Variable, Value},_From,  State = #controller_state{}) ->
+handle_call({replace,Task},_From,  State = #controller_state{}) ->
+  Value = (element(2,lists:keyfind("value",1,Task))),
+  Variable = (element(2,lists:keyfind("variable",1,Task))),
   UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
-handle_call({fork,JoinKey,ForkTargets},_From,  State = #controller_state{}) ->
+handle_call({fork,Task},_From,  State = #controller_state{}) ->
+  JoinKey = (element(2,lists:keyfind("joinKey",1,Task))),
+  ForkTargets = (element(2,lists:keyfind("forkTargets",1,Task))),
   UpdatedMap = maps:put(JoinKey,#{length => length(ForkTargets)},State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
-handle_call({join,JoinKey,Keys},_From,  State = #controller_state{}) ->
+handle_call({join,Task},_From,  State = #controller_state{}) ->
+  JoinKey = (element(2,lists:keyfind("joinKey",1,Task))),
+  Keys = (element(2,lists:keyfind("keys",1,Task))),
   UpdatedMap = putKeyInJoinList(Keys,State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   JoinStatus = checkJoinComplete(JoinKey,Keys,UpdatedMap),
   {reply,JoinStatus,State#controller_state{flow_map = UpdatedMap}};
 
-handle_call({flattenStringList,List,String}, _From, State = #controller_state{}) ->
+handle_call({flattenStringList,Task}, _From, State = #controller_state{}) ->
+  List = (element(2,lists:keyfind("list",1,Task))),
+  String = (element(2,lists:keyfind("string",1,Task))),
   FlatList = flattenStringList:flattenStringList(List),
   UpdatedMap = echo:echo(String,FlatList,State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),

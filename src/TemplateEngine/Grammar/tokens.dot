@@ -1,0 +1,20 @@
+digraph DFA {
+  7 [shape=doublecircle];
+  6 [shape=circle color=green];
+  5 [shape=doublecircle];
+  4 [shape=doublecircle];
+  3 [shape=doublecircle];
+  2 [shape=doublecircle];
+  1 [shape=doublecircle];
+  0 [shape=doublecircle];
+
+  7 -> 7 [label="[_\\sA-Za-z]"];
+  6 -> 0 [label="\]"];
+  6 -> 1 [label="\["];
+  6 -> 2 [label="{"];
+  6 -> 3 [label="@"];
+  6 -> 4 [label="}"];
+  6 -> 5 [label="[0-9]"];
+  6 -> 7 [label="[_\\sA-Za-z]"];
+  5 -> 5 [label="[0-9]"];
+}

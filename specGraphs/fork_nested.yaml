@@ -17,7 +17,7 @@ graphs:
       target: "runner2@127.0.0.1"
   A:
     - type: fork
-      forkTargets: [ C,D ]
+      forkTargets: [C,D]
       joinKey: join2
       target: "runner2@127.0.0.1"
   B:
@@ -26,7 +26,6 @@ graphs:
       put: k
       target: "runner3@127.0.0.1"
       goTo: JoinTarget
-
   C:
     - type: echo
       value: "Hello1"

@@ -26,7 +26,7 @@ start_link() ->
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
 init([]) ->
-    SupFlags = #{strategy => one_for_all,
+    SupFlags = #{strategy => one_for_one,
                  intensity => 0,
                  period => 1},
   NodeController = #{
@@ -34,7 +34,7 @@ init([]) ->
     start => {controller, start_link,[]},
     restart => permanent,
     shutdown => 5000,
-    type => supervisor,
+    type => worker,
     modules => [controller]
   },
   MessageBroker = #{
@@ -42,7 +42,7 @@ init([]) ->
     start => {message_broker, start_link,[]},
     restart => permanent,
     shutdown => 5000,
-    type => supervisor,
+    type => worker,
     modules => [message_broker]
   },
   Runner = #{
@@ -50,7 +50,7 @@ init([]) ->
     start => {runner, start_link,[]},
     restart => permanent,
     shutdown => 5000,
-    type => supervisor,
+    type => worker,
     modules => [runner]
   },
     ChildSpecs = [NodeController,MessageBroker,Runner],

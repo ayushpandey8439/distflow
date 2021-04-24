@@ -17,7 +17,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
--export([echo/2,replace/2,fork/2,join/2,flattenStringList/2]).
+-export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2]).
 -export([resetState/1]).
 -define(SERVER, ?MODULE).
 name() ->runner.
@@ -110,31 +110,38 @@ code_change(_OldVsn, State = #runner_state{}, _Extra) ->
 
 echo(Target,Task)->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-    Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
-    Put = (element(2,lists:keyfind("put",1,TemplatedTask))),
-    gen_server:call(Target, {echo,Put,Value}),
+    gen_server:call(Target, {echo,TemplatedTask}),
     nextTask(TemplatedTask).
+
+listfiles(Target,Task)->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:call(Target, {listfiles,TemplatedTask}),
+  nextTask(TemplatedTask).
 
 replace(Target, Task)->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-    Value = (element(2,lists:keyfind("value",1,TemplatedTask))),
-    Variable = (element(2,lists:keyfind("variable",1,TemplatedTask))),
-    gen_server:call(Target, {replace,Variable,Value}).
+    gen_server:call(Target, {replace,TemplatedTask}),
+    nextTask(TemplatedTask).
+
+map(Target,Task) ->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  MapList = (element(2,lists:keyfind("list",1,TemplatedTask))),
+  MapTarget = (element(2,lists:keyfind("mapTarget",1,TemplatedTask))),
+  lists:map(fun(element) -> gen_server:call(Target,{MapTarget,TemplatedTask}) end,MapList).
+
 
 fork(Target,Task) ->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
     JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
     ForkTargets = (element(2,lists:keyfind("forkTargets",1,TemplatedTask))),
     gen_server:cast(self(),{setJoinLength,JoinKey,length(ForkTargets)}),
-    gen_server:call(Target,{fork,JoinKey,ForkTargets}),
+    gen_server:call(Target,{fork,TemplatedTask}),
     {fork, ForkTargets}.
 
 join(Target, Task) ->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
     JoinTarget = (element(2,lists:keyfind("joinTarget",1,TemplatedTask))),
-    JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
-    Keys = (element(2,lists:keyfind("keys",1,TemplatedTask))),
-    case gen_server:call(Target,{join,JoinKey,Keys}) of
+    case gen_server:call(Target,{join,TemplatedTask}) of
       wait ->
         wait;
       join_complete ->
@@ -153,7 +160,5 @@ resetState(Target)->
 
 flattenStringList(Target,Task) ->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  List = (element(2,lists:keyfind("list",1,TemplatedTask))),
-  String = (element(2,lists:keyfind("string",1,TemplatedTask))),
-  gen_server:call(Target, {flattenStringList,List,String}),
+  gen_server:call(Target, {flattenStringList,TemplatedTask}),
   nextTask(TemplatedTask).

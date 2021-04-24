@@ -29,7 +29,7 @@ graphs:
       put: alphabet2
       target: "runner2@127.0.0.1"
     - type: echo
-      value: "{alphabet2} by the runner"
+      value: "{alphabet} by the runner"
       put: io
       target: "runner3@127.0.0.1"
     - type: echo
