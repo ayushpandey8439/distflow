@@ -3,8 +3,19 @@ start: "start"
 graphs:
   start:
     - type: listfiles
-      folder: "/Users/pandey/Desktop/Notes/thesis/distflow/testCases"
+      folder: "/Users/pandey/Desktop/testvideos/source"
       output: files
+    - type: map
+      list: "{files}"
+      mapOperation: print
+      putElement: file
+      targets: ["runner1@127.0.0.1","runner2@127.0.0.1","runner3@127.0.0.1"]
+  print:
     - type: echo
-      value: "{files}"
+      value: "{file}"
       put: io
+    - type: convertFile
+      source: "{file}"
+      output: "{file}"
+      format: "mp3"
+

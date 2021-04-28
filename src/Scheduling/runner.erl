@@ -17,8 +17,8 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
--export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2]).
--export([resetState/1]).
+-export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2,convertFile/2]).
+-export([resetState/1,setScope/3]).
 -define(SERVER, ?MODULE).
 name() ->runner.
 -record(runner_state, {}).
@@ -107,7 +107,6 @@ code_change(_OldVsn, State = #runner_state{}, _Extra) ->
 %%%===================================================================
 
 
-
 echo(Target,Task)->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
     gen_server:call(Target, {echo,TemplatedTask}),
@@ -126,8 +125,10 @@ replace(Target, Task)->
 map(Target,Task) ->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
   MapList = (element(2,lists:keyfind("list",1,TemplatedTask))),
-  MapTarget = (element(2,lists:keyfind("mapTarget",1,TemplatedTask))),
-  lists:map(fun(element) -> gen_server:call(Target,{MapTarget,TemplatedTask}) end,MapList).
+  MapOperation = (element(2,lists:keyfind("mapOperation",1,TemplatedTask))),
+  PutElement = (element(2,lists:keyfind("putElement",1,TemplatedTask))),
+  Targets = (element(2,lists:keyfind("targets",1,TemplatedTask))),
+  {map, {MapList,MapOperation,PutElement,Targets}}.
 
 
 fork(Target,Task) ->
@@ -147,6 +148,15 @@ join(Target, Task) ->
       join_complete ->
         {goto,(JoinTarget)}
     end.
+convertFile(Target,Task)->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:call(Target,{convertFile,TemplatedTask}),
+  nextTask(TemplatedTask).
+
+
+setScope(Target, ScopeVariable, ScopeValue)->
+  gen_server:call(Target,{setScope, ScopeVariable,ScopeValue}).
+
 
 
 nextTask(TaskTemplate) ->

@@ -59,8 +59,13 @@ init([]) ->
 handle_call({echo,Task}, _From, State = #controller_state{}) ->
   Value = (element(2,lists:keyfind("value",1,Task))),
   Put = (element(2,lists:keyfind("put",1,Task))),
-
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
+
+handle_call({setScope, ScopeVariable,ScopeValue}, _From, State = #controller_state{})->
+  UpdatedMap = echo:echo(ScopeVariable,ScopeValue,State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
@@ -71,6 +76,13 @@ handle_call({listfiles,Task}, _From, State = #controller_state{}) ->
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
+handle_call({convertFile,Task},_From,State = #controller_state{})->
+  SourceFile = (element(2,lists:keyfind("source",1,Task))),
+  OutputFile = (element(2,lists:keyfind("output",1,Task))),
+  OutputFormat = (element(2,lists:keyfind("format",1,Task))),
+  UpdatedMap = convertFile:convertFile(SourceFile,OutputFile,OutputFormat,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
   TemplatedTask = template_engine:replace(Task,State#controller_state.flow_map),

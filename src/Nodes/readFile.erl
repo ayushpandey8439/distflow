@@ -6,8 +6,16 @@
 %%% @end
 %%% Created : 27. Apr 2021 19:40
 %%%-------------------------------------------------------------------
--module(read).
+-module(readFile).
 -author("pandey").
 
 %% API
--export([]).
+-export([read/2]).
+
+read(Path,Map) ->
+  case file:read_file(Path) of
+    {ok, Contents} ->
+      Contents;
+    {error, Reason}->
+      {error, Reason}
+  end.
