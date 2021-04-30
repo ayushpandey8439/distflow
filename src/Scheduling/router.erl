@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 31. Mar 2021 03:18
 %%%-------------------------------------------------------------------
--module(runner).
+-module(router).
 -author("pandey").
 
 -behaviour(gen_server).
@@ -17,7 +17,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
--export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2,convertFile/2]).
+-export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2,convertFile/2,readfile/2,stringToList/2]).
 -export([resetState/1,setScope/3]).
 -define(SERVER, ?MODULE).
 name() ->runner.
@@ -153,6 +153,15 @@ convertFile(Target,Task)->
   gen_server:call(Target,{convertFile,TemplatedTask}),
   nextTask(TemplatedTask).
 
+readfile(Target, Task)->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:call(Target,{readfile,TemplatedTask}),
+  nextTask(TemplatedTask).
+
+stringToList(Target, Task)->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:call(Target,{stringToList,TemplatedTask}),
+  nextTask(TemplatedTask).
 
 setScope(Target, ScopeVariable, ScopeValue)->
   gen_server:call(Target,{setScope, ScopeVariable,ScopeValue}).

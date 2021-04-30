@@ -6,7 +6,7 @@
 %%% @end
 %%% Created : 14. Dec 2020 22:43
 %%%-------------------------------------------------------------------
--module(task_runner).
+-module(scheduler).
 -author("pandey").
 
 %% API
@@ -18,7 +18,7 @@ runtask(Path) ->
   Spec = yamerl_constr:file(Path),
   UnnestedSpec = lists:nth(1,Spec),
   logger:warning("Starting execution of ~p",[element(2,lists:keyfind("name",1,UnnestedSpec))]),
-  SpecList = element(2,lists:keyfind("graphs",1,UnnestedSpec)),
+  SpecList = element(2,lists:keyfind("labels",1,UnnestedSpec)),
   {TaskNameList, TaskList} = lists:unzip(SpecList),
   StartSpecName = getStartSpec(UnnestedSpec),
   StartIndex = getIndex(StartSpecName,TaskNameList,1),
@@ -26,10 +26,11 @@ runtask(Path) ->
   execute(StartIndex,TaskNameList,TaskList,TargetRecord),
   resetState().
 
-  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
-  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
-  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
-  %% task_runner:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
+  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
+  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
+  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
+  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
+  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfileshttp.yaml").
 
 
 execute(Index,SpecNameList,SpecList,TargetRecord) when length(SpecList) >= Index->
@@ -77,7 +78,7 @@ executeTask(Task,TargetRecord)->
               Tuple -> list_to_atom(element(2,Tuple))
             end,
   TaskName = list_to_atom(element(2,lists:keyfind("type",1,Task))),
-  apply(runner,TaskName,[{controller,Target},Task]).
+  apply(router,TaskName,[{controller,Target},Task]).
 
 
 getStartSpec(Spec)->
@@ -102,9 +103,9 @@ executeForkTarget(TargetTask,SpecNameList,SpecList,TargetRecord)->
 executeMapOperation(ExecutionTarget,PutValue,MapOperation,PutElement,SpecNameList,SpecList,TargetRecord)->
   TaskIndex = getIndex(MapOperation, SpecNameList,1),
   UpdatedTargetRecord = TargetRecord#run_target{target = ExecutionTarget},
-  apply(runner,setScope,[{controller,ExecutionTarget},PutElement,PutValue]),
+  apply(router,setScope,[{controller,ExecutionTarget},PutElement,PutValue]),
   execute(TaskIndex,SpecNameList,SpecList,UpdatedTargetRecord).
 
 
 resetState()->
-  apply(runner,resetState,[controller]).
+  apply(router,resetState,[controller]).

@@ -10,12 +10,12 @@
 -author("pandey").
 
 %% API
--export([read/2]).
+-export([read/3]).
 
-read(Path,Map) ->
+read(Path,Output,Map) ->
   case file:read_file(Path) of
     {ok, Contents} ->
-      Contents;
+      maps:put(Output,binary_to_list(Contents),Map);
     {error, Reason}->
       {error, Reason}
   end.

@@ -1,6 +1,6 @@
 name: Test
 start: "task1"
-graphs:
+labels:
   start:
     - type: echo
       value: "Final Data to be print"

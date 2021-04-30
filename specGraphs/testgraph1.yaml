@@ -1,6 +1,6 @@
 name: Test_replace
 start: "start"
-graphs:
+labels:
   start:
     - type: echo
       value: "Final Data to be print"

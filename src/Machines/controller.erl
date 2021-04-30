@@ -84,6 +84,20 @@ handle_call({convertFile,Task},_From,State = #controller_state{})->
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
+handle_call({readfile,Task},_From,State = #controller_state{})->
+  Path = (element(2,lists:keyfind("file",1,Task))),
+  Output = (element(2,lists:keyfind("output",1,Task))),
+  UpdatedMap = readFile:read(Path,Output,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
+handle_call({stringToList,Task},_From,State = #controller_state{})->
+  Variable = (element(2,lists:keyfind("string",1,Task))),
+  Delimiter = (element(2,lists:keyfind("delimiter",1,Task))),
+  UpdatedMap = stringToList:convert(Variable,Delimiter,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
   TemplatedTask = template_engine:replace(Task,State#controller_state.flow_map),
   {reply, TemplatedTask, State};

@@ -1,0 +1,14 @@
+name: convert
+start: "start"
+labels:
+  start:
+    - type: readfile
+      file: "/Users/pandey/Desktop/testvideos/listOfUrls.txt"
+      output: fileUrls
+    - type: stringToList
+      string: fileUrls
+      delimiter: "\n"
+    - type: echo
+      value: "{fileUrls}"
+      put: io
+

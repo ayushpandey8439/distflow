@@ -45,15 +45,15 @@ init([]) ->
     type => worker,
     modules => [message_broker]
   },
-  Runner = #{
-    id => runner,
-    start => {runner, start_link,[]},
+  Router = #{
+    id => router,
+    start => {router, start_link,[]},
     restart => permanent,
     shutdown => 5000,
     type => worker,
-    modules => [runner]
+    modules => [router]
   },
-    ChildSpecs = [NodeController,MessageBroker,Runner],
+    ChildSpecs = [NodeController,MessageBroker,Router],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions

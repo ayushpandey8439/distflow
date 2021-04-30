@@ -1,6 +1,6 @@
 name: convert
 start: "start"
-graphs:
+labels:
   start:
     - type: listfiles
       folder: "/Users/pandey/Desktop/testvideos/source"
