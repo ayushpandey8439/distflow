@@ -17,7 +17,7 @@
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2,
   code_change/3]).
--export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2,convertFile/2,readfile/2,stringToList/2]).
+-export([echo/2,replace/2,fork/2,join/2,flattenStringList/2,listfiles/2,map/2,convertFile/2,readfile/2,stringToList/2,syncHttpRequest/2]).
 -export([resetState/1,setScope/3]).
 -define(SERVER, ?MODULE).
 name() ->runner.
@@ -82,7 +82,7 @@ handle_cast({setJoinLength,JoinKey,Length}, State = #runner_state{}) ->
   {noreply, NewState :: #runner_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), NewState :: #runner_state{}}).
 handle_info(_Info, State = #runner_state{}) ->
-  {noreply, State}.
+  {noreply, State,100000}.
 
 %% @private
 %% @doc This function is called by a gen_server when it is about to
@@ -114,12 +114,12 @@ echo(Target,Task)->
 
 listfiles(Target,Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:call(Target, {listfiles,TemplatedTask}),
+  gen_server:cast(Target, {listfiles,TemplatedTask}),
   nextTask(TemplatedTask).
 
 replace(Target, Task)->
     TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-    gen_server:call(Target, {replace,TemplatedTask}),
+    gen_server:cast(Target, {replace,TemplatedTask}),
     nextTask(TemplatedTask).
 
 map(Target,Task) ->
@@ -136,7 +136,7 @@ fork(Target,Task) ->
     JoinKey = (element(2,lists:keyfind("joinKey",1,TemplatedTask))),
     ForkTargets = (element(2,lists:keyfind("forkTargets",1,TemplatedTask))),
     gen_server:cast(self(),{setJoinLength,JoinKey,length(ForkTargets)}),
-    gen_server:call(Target,{fork,TemplatedTask}),
+    gen_server:cast(Target,{fork,TemplatedTask}),
     {fork, ForkTargets}.
 
 join(Target, Task) ->
@@ -150,17 +150,27 @@ join(Target, Task) ->
     end.
 convertFile(Target,Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:call(Target,{convertFile,TemplatedTask}),
+  gen_server:cast(Target,{convertFile,TemplatedTask}),
   nextTask(TemplatedTask).
 
 readfile(Target, Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:call(Target,{readfile,TemplatedTask}),
+  gen_server:cast(Target,{readfile,TemplatedTask}),
   nextTask(TemplatedTask).
 
 stringToList(Target, Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:call(Target,{stringToList,TemplatedTask}),
+  gen_server:cast(Target,{stringToList,TemplatedTask}),
+  nextTask(TemplatedTask).
+
+syncHttpRequest(Target, Task)->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:cast(Target,{syncHttpRequest,TemplatedTask}),
+  nextTask(TemplatedTask).
+
+flattenStringList(Target,Task) ->
+  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
+  gen_server:call(Target, {flattenStringList,TemplatedTask}),
   nextTask(TemplatedTask).
 
 setScope(Target, ScopeVariable, ScopeValue)->
@@ -176,8 +186,3 @@ nextTask(TaskTemplate) ->
 
 resetState(Target)->
   gen_server:cast(Target,{clearState}).
-
-flattenStringList(Target,Task) ->
-  TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:call(Target, {flattenStringList,TemplatedTask}),
-  nextTask(TemplatedTask).

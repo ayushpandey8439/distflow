@@ -13,12 +13,7 @@
 -export([listfiles/3]).
 
 listfiles(Path,TargetVariable,Map)->
-  FixedPath = case pathEnder(Path) of
-                47 -> Path;
-                _Else ->
-                  lists:append([Path,"/"])
-              end,
-
+  FixedPath = path:fix(Path),
   case file:list_dir(Path) of
     {ok, Filenames} ->
       UpdatedFileNames = lists:map(fun(FileName) -> lists:append([FixedPath,FileName]) end,Filenames),
@@ -26,6 +21,3 @@ listfiles(Path,TargetVariable,Map)->
     {error, Reason} ->
       maps:put(TargetVariable,Reason,Map)
   end.
-
-pathEnder(Path) ->
-  lists:last(Path).

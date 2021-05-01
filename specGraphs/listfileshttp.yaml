@@ -8,7 +8,16 @@ labels:
     - type: stringToList
       string: fileUrls
       delimiter: "\n"
+    - type: map
+      list: "{fileUrls}"
+      putElement: fileUrl
+      mapOperation: print
+      targets: ["runner1@127.0.0.1","runner2@127.0.0.1","runner3@127.0.0.1"]
+  print:
     - type: echo
-      value: "{fileUrls}"
+      value: "{fileUrl}"
       put: io
-
+    - type: syncHttpRequest
+      url: "{fileUrl}"
+      expectedContent: "video/mp4"
+      path: "/Users/pandey/Desktop/testvideos/httpFiles"

@@ -10,10 +10,9 @@
 -author("pandey").
 
 %% API
--export([convertFile/4]).
+-export([convertFile/3]).
 
-convertFile(SourceFile,OutputFile,TargetFormat,Map) ->
+convertFile(SourceFile,OutputFile,TargetFormat) ->
   OutputFileName = filename:rootname(OutputFile),
-  {async, Worker} = vice:convert(SourceFile,lists:append([OutputFileName,".",TargetFormat])),
-  io:format("Worker Started:: ~p ~n~n",[Worker]),
-  Map.
+  {async, Worker} = vice:convert(SourceFile,lists:append([OutputFileName,".",TargetFormat]),[{yes, true}]),
+  io:format("Worker Started:: ~p ~n~n",[Worker]).

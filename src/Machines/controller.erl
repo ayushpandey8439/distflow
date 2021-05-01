@@ -44,7 +44,7 @@ start_link() ->
   {stop, Reason :: term()} | ignore).
 init([]) ->
   Flow_map = maps:new(),
-  {ok, #controller_state{flow_map = Flow_map}}.
+  {ok, #controller_state{flow_map = Flow_map},100000}.
 
 %% @private
 %% @doc Handling call messages
@@ -56,46 +56,17 @@ init([]) ->
   {noreply, NewState :: #controller_state{}, timeout() | hibernate} |
   {stop, Reason :: term(), Reply :: term(), NewState :: #controller_state{}} |
   {stop, Reason :: term(), NewState :: #controller_state{}}).
+
+
 handle_call({echo,Task}, _From, State = #controller_state{}) ->
   Value = (element(2,lists:keyfind("value",1,Task))),
   Put = (element(2,lists:keyfind("put",1,Task))),
   UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
+  {reply,ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({setScope, ScopeVariable,ScopeValue}, _From, State = #controller_state{})->
   UpdatedMap = echo:echo(ScopeVariable,ScopeValue,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
-handle_call({listfiles,Task}, _From, State = #controller_state{}) ->
-  Folder = (element(2,lists:keyfind("folder",1,Task))),
-  TargetVar = (element(2,lists:keyfind("output",1,Task))),
-  UpdatedMap = listfiles:listfiles(Folder,TargetVar,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
-handle_call({convertFile,Task},_From,State = #controller_state{})->
-  SourceFile = (element(2,lists:keyfind("source",1,Task))),
-  OutputFile = (element(2,lists:keyfind("output",1,Task))),
-  OutputFormat = (element(2,lists:keyfind("format",1,Task))),
-  UpdatedMap = convertFile:convertFile(SourceFile,OutputFile,OutputFormat,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
-handle_call({readfile,Task},_From,State = #controller_state{})->
-  Path = (element(2,lists:keyfind("file",1,Task))),
-  Output = (element(2,lists:keyfind("output",1,Task))),
-  UpdatedMap = readFile:read(Path,Output,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
-handle_call({stringToList,Task},_From,State = #controller_state{})->
-  Variable = (element(2,lists:keyfind("string",1,Task))),
-  Delimiter = (element(2,lists:keyfind("delimiter",1,Task))),
-  UpdatedMap = stringToList:convert(Variable,Delimiter,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
@@ -105,20 +76,6 @@ handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
 handle_call({update_map,Map}, _From, State = #controller_state{}) ->
   {reply, Map, State#controller_state{flow_map = Map}};
 
-handle_call({replace,Task},_From,  State = #controller_state{}) ->
-  Value = (element(2,lists:keyfind("value",1,Task))),
-  Variable = (element(2,lists:keyfind("variable",1,Task))),
-  UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
-handle_call({fork,Task},_From,  State = #controller_state{}) ->
-  JoinKey = (element(2,lists:keyfind("joinKey",1,Task))),
-  ForkTargets = (element(2,lists:keyfind("forkTargets",1,Task))),
-  UpdatedMap = maps:put(JoinKey,#{length => length(ForkTargets)},State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
-
 handle_call({join,Task},_From,  State = #controller_state{}) ->
   JoinKey = (element(2,lists:keyfind("joinKey",1,Task))),
   Keys = (element(2,lists:keyfind("keys",1,Task))),
@@ -127,7 +84,7 @@ handle_call({join,Task},_From,  State = #controller_state{}) ->
   JoinStatus = checkJoinComplete(JoinKey,Keys,UpdatedMap),
   {reply,JoinStatus,State#controller_state{flow_map = UpdatedMap}};
 
-handle_call({flattenStringList,Task}, _From, State = #controller_state{}) ->
+handle_call({flattenStringList,Task},_From, State = #controller_state{}) ->
   List = (element(2,lists:keyfind("list",1,Task))),
   String = (element(2,lists:keyfind("string",1,Task))),
   FlatList = flattenStringList:flattenStringList(List),
@@ -150,8 +107,59 @@ handle_cast({clearState}, State = #controller_state{}) ->
   Clock = vector_clock:new(),
   Flow_map = maps:new(),
   gen_server:call({message_broker,node()},{broadcast,Flow_map,Clock}),
-  {noreply, State#controller_state{clock = Clock, flow_map = Flow_map}}.
+  {noreply, State#controller_state{clock = Clock, flow_map = Flow_map}};
 
+handle_cast({readfile,Task},State = #controller_state{})->
+  Path = (element(2,lists:keyfind("file",1,Task))),
+  Output = (element(2,lists:keyfind("output",1,Task))),
+  UpdatedMap = readFile:read(Path,Output,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {noreply,  State#controller_state{flow_map = UpdatedMap}};
+
+handle_cast({syncHttpRequest,Task},State = #controller_state{})->
+  Url = (element(2,lists:keyfind("url",1,Task))),
+  ContentType = (element(2,lists:keyfind("expectedContent",1,Task))),
+  OutputPath = (element(2,lists:keyfind("path",1,Task))),
+  UpdatedMap = syncHttp:get(Url,ContentType,OutputPath,State#controller_state.flow_map),
+  {noreply, State#controller_state{flow_map = UpdatedMap}};
+
+
+handle_cast({stringToList,Task},State = #controller_state{})->
+  Variable = (element(2,lists:keyfind("string",1,Task))),
+  Delimiter = (element(2,lists:keyfind("delimiter",1,Task))),
+  UpdatedMap = stringToList:convert(Variable,Delimiter,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {noreply, State#controller_state{flow_map = UpdatedMap}};
+
+
+handle_cast({listfiles,Task}, State = #controller_state{}) ->
+  Folder = (element(2,lists:keyfind("folder",1,Task))),
+  TargetVar = (element(2,lists:keyfind("output",1,Task))),
+  UpdatedMap = listfiles:listfiles(Folder,TargetVar,State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {noreply, State#controller_state{flow_map = UpdatedMap}};
+
+handle_cast({replace,Task},  State = #controller_state{}) ->
+  Value = (element(2,lists:keyfind("value",1,Task))),
+  Variable = (element(2,lists:keyfind("variable",1,Task))),
+  UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {noreply, State#controller_state{flow_map = UpdatedMap}};
+
+handle_cast({convertFile,Task},State = #controller_state{})->
+  SourceFile = (element(2,lists:keyfind("source",1,Task))),
+  OutputFile = (element(2,lists:keyfind("output",1,Task))),
+  OutputFormat = (element(2,lists:keyfind("format",1,Task))),
+  convertFile:convertFile(SourceFile,OutputFile,OutputFormat),
+  {noreply, State};
+
+
+handle_cast({fork,Task},  State = #controller_state{}) ->
+  JoinKey = (element(2,lists:keyfind("joinKey",1,Task))),
+  ForkTargets = (element(2,lists:keyfind("forkTargets",1,Task))),
+  UpdatedMap = maps:put(JoinKey,#{length => length(ForkTargets)},State#controller_state.flow_map),
+  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+  {noreply, State#controller_state{flow_map = UpdatedMap}}.
 %% @private
 %% @doc Handling all non call/cast messages
 -spec(handle_info(Info :: timeout() | term(), State :: #controller_state{}) ->
