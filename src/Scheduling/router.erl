@@ -127,8 +127,11 @@ map(Target,Task) ->
   MapList = (element(2,lists:keyfind("list",1,TemplatedTask))),
   MapOperation = (element(2,lists:keyfind("mapOperation",1,TemplatedTask))),
   PutElement = (element(2,lists:keyfind("putElement",1,TemplatedTask))),
-  Targets = (element(2,lists:keyfind("targets",1,TemplatedTask))),
-  {map, {MapList,MapOperation,PutElement,Targets}}.
+  case lists:keyfind("targets",1,TemplatedTask) of
+    {_,Targets} -> {map, {MapList,MapOperation,PutElement,Targets}};
+    false ->  {map, {MapList,MapOperation,PutElement,[node()]}};
+    _ ->{map, {MapList,MapOperation,PutElement,[node()]}}
+  end.
 
 
 fork(Target,Task) ->
