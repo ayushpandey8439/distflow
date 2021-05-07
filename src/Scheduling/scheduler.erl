@@ -10,10 +10,10 @@
 -author("pandey").
 
 %% API
--export([runtask/1]).
+-export([run/1]).
 -record(run_target, {target = node()}).
 
-runtask(Path) ->
+run(Path) ->
   application:start(yamerl),
   Spec = yamerl_constr:file(Path),
   UnnestedSpec = lists:nth(1,Spec),
@@ -26,11 +26,11 @@ runtask(Path) ->
   execute(StartIndex,TaskNameList,TaskList,TargetRecord),
   resetState().
 
-  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
-  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
-  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
-  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
-  %% scheduler:runtask("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfileshttp.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfileshttp.yaml").
 
 
 execute(Index,SpecNameList,SpecList,TargetRecord) when length(SpecList) >= Index->
