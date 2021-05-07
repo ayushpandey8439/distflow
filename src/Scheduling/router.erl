@@ -129,7 +129,7 @@ map(Target,Task) ->
   PutElement = (element(2,lists:keyfind("putElement",1,TemplatedTask))),
   case lists:keyfind("targets",1,TemplatedTask) of
     {_,Targets} -> {map, {MapList,MapOperation,PutElement,Targets}};
-    false ->  {map, {MapList,MapOperation,PutElement,[node()]}};
+    false ->  {map, {MapList,MapOperation,PutElement,[atom_to_list(node())]}};
     _ ->{map, {MapList,MapOperation,PutElement,[node()]}}
   end.
 

@@ -9,7 +9,6 @@ labels:
       list: "{files}"
       mapOperation: print
       putElement: file
-      targets: ["runner1@127.0.0.1","runner2@127.0.0.1","runner3@127.0.0.1"]
   print:
     - type: echo
       value: "{file}"
@@ -17,5 +16,5 @@ labels:
     - type: convertFile
       source: "{file}"
       output: "{file}"
-      format: "mp3"
+      format: "mkv"
 
