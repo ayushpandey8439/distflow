@@ -14,8 +14,8 @@
 
 echo(Put,Value,Map) when Put == "io" ->
   io:format("~p ~n",[Value]),
- Map;
+  {false,Map};
 
 echo(Put,Value,Map) when Put =/= "io" ->
   UpdatedMap = maps:put(Put,Value,Map),
-  UpdatedMap.
+  {true,UpdatedMap}.

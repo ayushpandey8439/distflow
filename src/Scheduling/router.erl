@@ -153,7 +153,7 @@ join(Target, Task) ->
     end.
 convertFile(Target,Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:cast(Target,{convertFile,TemplatedTask}),
+  gen_server:call(Target,{convertFile,TemplatedTask}),
   nextTask(TemplatedTask).
 
 readfile(Target, Task)->
@@ -168,7 +168,7 @@ stringToList(Target, Task)->
 
 syncHttpRequest(Target, Task)->
   TemplatedTask = gen_server:call(Target,{replaceTemplates,Task}),
-  gen_server:cast(Target,{syncHttpRequest,TemplatedTask}),
+  gen_server:call(Target,{syncHttpRequest,TemplatedTask}),
   nextTask(TemplatedTask).
 
 flattenStringList(Target,Task) ->

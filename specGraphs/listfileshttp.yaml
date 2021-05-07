@@ -12,7 +12,7 @@ labels:
       list: "{fileUrls}"
       putElement: fileUrl
       mapOperation: print
-      targets: ["runner1@127.0.0.1","runner2@127.0.0.1","runner3@127.0.0.1"]
+      targets: ["runner1@127.0.0.1","runner2@127.0.0.1"]
   print:
     - type: echo
       value: "{fileUrl}"
@@ -21,3 +21,9 @@ labels:
       url: "{fileUrl}"
       expectedContent: "video/mp4"
       path: "/Users/pandey/Desktop/testvideos/httpFiles"
+    - type: convertFile
+      sourcePath: "/Users/pandey/Desktop/testvideos/httpFiles"
+      sourceName: "{fileUrl}"
+      outputPath: "/Users/pandey/Desktop/testvideos/httpOutput"
+      outputName: "{fileUrl}"
+      format: "mp3"

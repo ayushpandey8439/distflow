@@ -61,12 +61,16 @@ init([]) ->
 handle_call({echo,Task}, _From, State = #controller_state{}) ->
   Value = (element(2,lists:keyfind("value",1,Task))),
   Put = (element(2,lists:keyfind("put",1,Task))),
-  UpdatedMap = echo:echo(Put,Value,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply,ok, State#controller_state{flow_map = UpdatedMap}};
+  case echo:echo(Put,Value,State#controller_state.flow_map) of
+    {true, UpdatedMap} ->
+      gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+      {reply,ok, State#controller_state{flow_map = UpdatedMap}};
+    {false,_Map} ->
+      {reply,ok,State}
+  end;
 
 handle_call({setScope, ScopeVariable,ScopeValue}, _From, State = #controller_state{})->
-  UpdatedMap = echo:echo(ScopeVariable,ScopeValue,State#controller_state.flow_map),
+  {_,UpdatedMap} = echo:echo(ScopeVariable,ScopeValue,State#controller_state.flow_map),
   {reply, ok, State#controller_state{flow_map = UpdatedMap}};
 
 handle_call({replaceTemplates,Task}, _From, State = #controller_state{}) ->
@@ -88,9 +92,29 @@ handle_call({flattenStringList,Task},_From, State = #controller_state{}) ->
   List = (element(2,lists:keyfind("list",1,Task))),
   String = (element(2,lists:keyfind("string",1,Task))),
   FlatList = flattenStringList:flattenStringList(List),
-  UpdatedMap = echo:echo(String,FlatList,State#controller_state.flow_map),
-  gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
-  {reply, ok, State#controller_state{flow_map = UpdatedMap}};
+  case echo:echo(String,FlatList,State#controller_state.flow_map) of
+    {true, UpdatedMap} ->
+      gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
+      {reply,ok, State#controller_state{flow_map = UpdatedMap}};
+    {false,_Map} ->
+      {reply,ok,State}
+  end;
+
+handle_call({syncHttpRequest,Task},_From,State = #controller_state{})->
+  Url = (element(2,lists:keyfind("url",1,Task))),
+  ContentType = (element(2,lists:keyfind("expectedContent",1,Task))),
+  OutputPath = (element(2,lists:keyfind("path",1,Task))),
+  UpdatedMap = syncHttp:get(Url,ContentType,OutputPath,State#controller_state.flow_map),
+  {reply,ok, State#controller_state{flow_map = UpdatedMap}};
+
+handle_call({convertFile,Task},_From,State = #controller_state{})->
+  SourceFileName = (element(2,lists:keyfind("sourceName",1,Task))),
+  SourceFilePath = (element(2,lists:keyfind("sourcePath",1,Task))),
+  OutputFileName = (element(2,lists:keyfind("outputName",1,Task))),
+  OutputFilePath = (element(2,lists:keyfind("outputPath",1,Task))),
+  OutputFormat = (element(2,lists:keyfind("format",1,Task))),
+  convertFile:convertFile(SourceFilePath,SourceFileName,OutputFilePath,OutputFileName,OutputFormat),
+  {reply,ok, State};
 
 handle_call(getMap,_From,  State = #controller_state{}) ->
   {reply, {ok,State#controller_state.flow_map} , State};
@@ -116,13 +140,6 @@ handle_cast({readfile,Task},State = #controller_state{})->
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {noreply,  State#controller_state{flow_map = UpdatedMap}};
 
-handle_cast({syncHttpRequest,Task},State = #controller_state{})->
-  Url = (element(2,lists:keyfind("url",1,Task))),
-  ContentType = (element(2,lists:keyfind("expectedContent",1,Task))),
-  OutputPath = (element(2,lists:keyfind("path",1,Task))),
-  UpdatedMap = syncHttp:get(Url,ContentType,OutputPath,State#controller_state.flow_map),
-  {noreply, State#controller_state{flow_map = UpdatedMap}};
-
 
 handle_cast({stringToList,Task},State = #controller_state{})->
   Variable = (element(2,lists:keyfind("string",1,Task))),
@@ -145,13 +162,6 @@ handle_cast({replace,Task},  State = #controller_state{}) ->
   UpdatedMap = replace:replace(Variable, Value, State#controller_state.flow_map),
   gen_server:call({message_broker,node()},{broadcast,UpdatedMap}),
   {noreply, State#controller_state{flow_map = UpdatedMap}};
-
-handle_cast({convertFile,Task},State = #controller_state{})->
-  SourceFile = (element(2,lists:keyfind("source",1,Task))),
-  OutputFile = (element(2,lists:keyfind("output",1,Task))),
-  OutputFormat = (element(2,lists:keyfind("format",1,Task))),
-  convertFile:convertFile(SourceFile,OutputFile,OutputFormat),
-  {noreply, State};
 
 
 handle_cast({fork,Task},  State = #controller_state{}) ->

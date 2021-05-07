@@ -26,11 +26,11 @@ run(Path) ->
   execute(StartIndex,TaskNameList,TaskList,TargetRecord),
   resetState().
 
-  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph.yaml").
-  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/testgraph1.yaml").
-  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/fork.yaml").
-  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfiles.yaml").
-  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/distFlow/specGraphs/listfileshttp.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/Implementation/distFlow/specGraphs/testgraph.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/Implementation/distFlow/specGraphs/testgraph1.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/Implementation/distFlow/specGraphs/fork.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/Implementation/distFlow/specGraphs/listfiles.yaml").
+  %% scheduler:run("/Users/pandey/Desktop/Notes/thesis/Implementation/distFlow/specGraphs/listfileshttp.yaml").
 
 
 execute(Index,SpecNameList,SpecList,TargetRecord) when length(SpecList) >= Index->
